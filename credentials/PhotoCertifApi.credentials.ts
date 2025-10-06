@@ -1,4 +1,6 @@
 import {
+	IAuthenticateGeneric,
+	ICredentialTestRequest,
 	ICredentialType,
 	INodeProperties,
 } from 'n8n-workflow';
@@ -6,7 +8,7 @@ import {
 export class PhotoCertifApi implements ICredentialType {
 	name = 'photoCertifApi';
 	displayName = 'PhotoCertif API';
-	documentationUrl = 'https://photocertif.com/docs/api';
+	documentationUrl = 'https://photocertif.com/docs';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'PhotoCertif URL',
@@ -14,7 +16,8 @@ export class PhotoCertifApi implements ICredentialType {
 			type: 'string',
 			default: 'https://app2.photocertif.com',
 			placeholder: 'https://app2.photocertif.com',
-			description: 'The URL of your PhotoCertif instance',
+			description: 'The base URL of your PhotoCertif instance',
+			required: true,
 		},
 		{
 			displayName: 'API Key',
@@ -25,54 +28,33 @@ export class PhotoCertifApi implements ICredentialType {
 			},
 			default: '',
 			placeholder: 'pk_live_xxxxxxxxxxxxx',
-			description: 'PhotoCertif API Key (generate from My Account → API Keys)',
+			description: 'Your PhotoCertif API Key. Generate one in PhotoCertif → My Account → API Keys. Required scopes: docs:read, docs:upload, docs:write',
 			required: true,
 		},
 		{
-			displayName: 'Solana Wallet Private Key',
-			name: 'walletPrivateKey',
-			type: 'string',
-			typeOptions: {
-				password: true,
-			},
+			displayName: 'Important Notice',
+			name: 'notice',
+			type: 'notice',
 			default: '',
-			placeholder: 'Base58 encoded private key',
-			description: 'Solana wallet private key for signing NFT transactions (keep secure!)',
-			required: true,
-		},
-		{
-			displayName: 'Solana Network',
-			name: 'solanaNetwork',
-			type: 'options',
-			options: [
-				{
-					name: 'Mainnet Beta',
-					value: 'mainnet-beta',
-				},
-				{
-					name: 'Devnet',
-					value: 'devnet',
-				},
-			],
-			default: 'mainnet-beta',
-			description: 'Solana network to use for NFT minting',
+			// @ts-ignore
+			text: '⚠️ This node submits certification requests only. The user must complete payment and NFT minting manually in the PhotoCertif interface. Use "Wait for Certification" operation to poll for completion.',
 		},
 	];
 
-	authenticate = {
-		type: 'generic' as const,
+	authenticate: IAuthenticateGeneric = {
+		type: 'generic',
 		properties: {
 			headers: {
-				'Authorization': '=Bearer {{$credentials.apiKey}}',
+				Authorization: '=Bearer {{$credentials.apiKey}}',
 			},
 		},
 	};
 
-	test = {
+	test: ICredentialTestRequest = {
 		request: {
 			baseURL: '={{$credentials.photoCertifUrl}}',
-			url: '/api/health',
-			method: 'GET' as const,
+			url: '/api/collections/list',
+			method: 'GET',
 		},
 	};
 }

@@ -1,116 +1,213 @@
 # n8n-nodes-photocertif
 
-Custom n8n node for **PhotoCertif** - Document certification on Solana blockchain.
+Custom n8n node for **PhotoCertif** - Document and Art certification on Solana blockchain.
 
 ## 🎯 Features
 
-- **📤 Upload Documents** - Upload documents for secure storage and certification
-- **🔍 Get Status** - Monitor certification progress and retrieve document info
-- **✅ Certify Documents** - Start blockchain NFT certification on Solana
-- **📥 Download Documents** - Retrieve original or certified copies
-- **🔐 Secure Credentials** - Wallet private keys stored securely in n8n credentials
+- **📤 Upload Documents & Images** - Upload content for secure storage
+- **📝 Submit Certification** - Prepare certification with all metadata
+- **🔍 Get Status** - Monitor certification progress
+- **⏳ Wait for Certification** - Poll status until completion (with timeout)
+- **📥 Download Content** - Retrieve certified files
+- **🎨 AI Analysis** - Automatic AI detection for art certification (media/image2)
+- **🔐 Secure API Keys** - Credentials stored encrypted in n8n
+
+## ⚠️ Important Limitations
+
+This node **prepares** certifications but does NOT:
+- ❌ Pay CHECKHC fees automatically (requires user wallet)
+- ❌ Mint NFT automatically (requires blockchain signature)
+- ❌ Complete certification without user intervention
+
+**The user must:**
+1. Connect their Solana wallet in PhotoCertif web interface
+2. Approve payment (~1 USD equivalent in CHECKHC)
+3. Sign NFT minting transaction
+
+**Use Cases:**
+- ✅ Bulk upload automation
+- ✅ Automated certification form submission
+- ✅ Status monitoring and reporting
+- ✅ Post-certification workflows
+- ❌ Fully automatic end-to-end certification (not possible without wallet)
+
+---
 
 ## 📦 Installation
 
-### Via n8n Community Nodes (Recommended)
+### Via n8n Community Nodes (When Published)
 
 1. Go to **Settings** → **Community Nodes**
 2. Click **Install**
 3. Enter: `n8n-nodes-photocertif`
 4. Click **Install**
 
-### Manual Installation
+### Manual Installation (Development)
 
 ```bash
 cd ~/.n8n/nodes
-npm install n8n-nodes-photocertif
+npm install /path/to/n8n-nodes-photocertif
 ```
 
 Restart n8n after installation.
 
+---
+
 ## 🔑 Configuration
 
-### Required Credentials
+### Create Credential
 
-Create a new **PhotoCertif API** credential with:
+1. Open n8n
+2. **Credentials** → **New Credential**
+3. Search for "**PhotoCertif API**"
+4. Fill in:
+   - **PhotoCertif URL**: `https://app2.photocertif.com`
+   - **API Key**: `pk_live_xxxxxxxxxxxxx`
 
-1. **PhotoCertif URL**: Your PhotoCertif instance URL (e.g., `https://app2.photocertif.com`)
-2. **API Key**: Generate from PhotoCertif → My Account → API Keys
-   - Required scopes: `docs:read`, `docs:upload`, `docs:write`
-3. **Solana Wallet Private Key**: Base58 encoded private key for signing NFT transactions
-4. **Solana Network**: mainnet-beta (production) or devnet (testing)
+### Generate API Key
 
-### Security Notes
+1. Go to https://app2.photocertif.com
+2. Login to your account
+3. Navigate to **My Account** → **API Keys**
+4. Click **Create API Key**
+5. Select scopes:
+   - `docs:read` - Get status, download
+   - `docs:upload` - Upload files
+   - `docs:write` - Submit certifications
+6. Copy the API key (starts with `pk_live_` or `pk_test_`)
 
-- Private keys are stored **encrypted** in n8n credentials
-- Transmitted over **HTTPS only**
-- Never logged or exposed in workflows
-- Use dedicated wallets for automation
+---
 
 ## 📚 Operations
 
-### 1. Upload Document
+### **1. Upload**
 
-Upload a document to PhotoCertif for certification.
+Upload a document or image to PhotoCertif.
 
 **Parameters:**
-- `File`: Base64 encoded file content or binary data reference
-- `Title`: Document title (required)
-- `Description`: Optional description
+- **Resource Type**: `docs` (documents) or `image2` (art)
+- **File**: Base64 encoded content
+- **Title**: Content title (required)
+- **Description**: Optional description
 
 **Returns:**
 ```json
 {
   "success": true,
-  "storage_id": "iv_xxxxxxxxxxxxx",
-  "message": "Document uploaded successfully"
+  "storage_id": "iv_1234567890_abc123",
+  "message": "Upload successful"
 }
 ```
 
-### 2. Get Status
+---
 
-Check the certification status of a document.
+### **2. Submit Certification**
 
-**Parameters:**
-- `Storage ID`: The ID returned from upload
+Submit certification form with all metadata. **Note:** User must complete payment and minting in PhotoCertif interface.
+
+**Parameters (4 Required + 11 Optional):**
+
+**Required:**
+- **Storage ID**: `iv_xxxxx` from upload
+- **Certification Name**: Name for the NFT
+- **Symbol**: 4 uppercase letters (e.g., `CNTR`)
+- **Description**: Detailed description
+- **Owner**: Owner name
+
+**Optional:**
+- **Collection Mint Address**: NFT collection to join
+- **Website URL**: Project website
+- **Twitter URL**: Twitter/X profile
+- **Discord URL**: Discord server
+- **Instagram URL**: Instagram profile
+- **Telegram URL**: Telegram channel
+- **Medium URL**: Medium blog
+- **Wiki URL**: Documentation wiki
+- **YouTube URL**: YouTube channel
 
 **Returns:**
 ```json
 {
-  "id": "iv_xxxxxxxxxxxxx",
+  "success": true,
+  "storage_id": "iv_xxxxx",
+  "notice": "Certification form submitted. User must complete payment...",
+  "certification_url": "https://app2.photocertif.com/media/docs/certification?iv_storageid=iv_xxxxx"
+}
+```
+
+---
+
+### **3. Get Status**
+
+Check certification status.
+
+**Parameters:**
+- **Storage ID**: `iv_xxxxx`
+
+**Returns (docs):**
+```json
+{
+  "id": "iv_xxxxx",
   "title": "Contract 2025",
+  "status": "uploaded" | "certified",
+  "created_at": "2025-01-06T20:00:00Z",
+  "nft_address": "ABC123..." // if certified
+}
+```
+
+**Returns (image2 - with AI fields):**
+```json
+{
+  "id": "iv_xxxxx",
+  "title": "Artwork",
   "status": "certified",
   "nft_address": "ABC123...",
-  "certification_url": "https://...",
-  "created_at": "2025-01-06T20:00:00Z"
+  "ai_generated": false,
+  "ai_generated_score": 0.12,
+  "ai_source": "HUMAN_CREATED",
+  "Human_score": 0.88,
+  "ai_prediction_id": "pred_xyz"
 }
 ```
 
-### 3. Certify Document
+---
 
-Start blockchain NFT certification. This mints an NFT on Solana blockchain.
+### **4. Wait for Certification** ⭐
+
+Poll status until certified or timeout. **This is the key to automation!**
 
 **Parameters:**
-- `Storage ID`: Document to certify
-- `Additional Metadata`: Optional JSON metadata for NFT
+- **Storage ID**: `iv_xxxxx`
+- **Polling Interval**: Seconds between checks (default: 300 = 5 minutes)
+- **Max Wait Time**: Maximum seconds to wait (default: 86400 = 24 hours)
+
+**How it works:**
+1. Checks status every X seconds
+2. Returns immediately when `status === "certified"`
+3. Times out if max wait time exceeded
+4. Useful after user is notified to complete payment
 
 **Returns:**
 ```json
 {
   "success": true,
+  "status": "certified",
+  "storage_id": "iv_xxxxx",
   "nft_address": "ABC123...",
-  "transaction_signature": "xyz..."
+  "wait_time_seconds": 1800,
+  "attempts": 6,
+  "message": "Certification completed after 1800 seconds (6 checks)"
 }
 ```
 
-**Note:** This operation uses your Solana wallet to mint the NFT and pay blockchain fees (~0.02-0.05 SOL + 10-15 CHECKHC tokens).
+---
 
-### 4. Download Document
+### **5. Download**
 
-Download the certified document.
+Download certified content.
 
 **Parameters:**
-- `Storage ID`: Document to download
+- **Storage ID**: `iv_xxxxx`
 
 **Returns:**
 ```json
@@ -120,116 +217,171 @@ Download the certified document.
 }
 ```
 
+---
+
 ## 🔄 Example Workflows
 
-### Workflow 1: Auto-certify from Google Drive
+### Workflow 1: Semi-Automated Certification
 
 ```
-Trigger: Google Drive (New file)
+Manual Trigger
   ↓
-Node: Read Binary File
+PhotoCertif - Upload
+  - Resource: docs
+  - File: {{$json.base64_content}}
+  - Title: "Contract 2025"
   ↓
-Node: PhotoCertif (Upload Document)
-  - File: {{$binary.data}}
-  - Title: {{$json.name}}
-  ↓
-Node: Wait (2 minutes)
-  ↓
-Node: PhotoCertif (Certify Document)
+PhotoCertif - Submit Certification
   - Storage ID: {{$json.storage_id}}
+  - Name: "Contract2025"
+  - Symbol: "CNTR"
+  - Description: "Legal contract"
+  - Owner: "Company ABC"
   ↓
-Node: PhotoCertif (Get Status)
+Send Email - Notification
+  - To: user@example.com
+  - Subject: "⏳ Complete Certification Payment"
+  - Body: "Click: {{$json.certification_url}}"
+  ↓
+PhotoCertif - Wait for Certification
   - Storage ID: {{$json.storage_id}}
+  - Polling Interval: 300 (5 minutes)
+  - Max Wait Time: 86400 (24 hours)
   ↓
-Node: Email (Send notification)
-  - Subject: "Document Certified"
-  - Body: "NFT Address: {{$json.nft_address}}"
+Send Email - Success
+  - Subject: "✅ NFT Minted!"
+  - Body: "NFT: {{$json.nft_address}}"
 ```
 
-### Workflow 2: Scheduled certification check
+### Workflow 2: Bulk Upload with Monitoring
 
 ```
-Trigger: Schedule (Every hour)
+Schedule Trigger (Daily)
   ↓
-Node: HTTP Request (Get list of pending docs)
+Read Files from Folder
   ↓
-Loop: For each document
+Loop: For each file
   ↓
-  Node: PhotoCertif (Get Status)
+  PhotoCertif - Upload
+    - File: {{$binary.data}}
+    - Title: {{$json.filename}}
   ↓
-  If: status !== 'certified'
+  Store in Database
+    - storage_id
+    - status: "pending"
+  ↓
+Send Report
+  - "Uploaded X documents, awaiting certification"
+```
+
+### Workflow 3: Status Monitor
+
+```
+Schedule Trigger (Every hour)
+  ↓
+Database - Get Pending Certifications
+  ↓
+Loop: For each pending
+  ↓
+  PhotoCertif - Get Status
+    - Storage ID: {{$json.storage_id}}
+  ↓
+  IF: status === "certified"
     ↓
-    Node: PhotoCertif (Certify Document)
+    Database - Update Status
+    ↓
+    Send Notification
+    ↓
+    Generate Certificate PDF
+    ↓
+    Upload to Cloud Storage
 ```
 
-### Workflow 3: Webhook-triggered certification
+---
 
-```
-Trigger: Webhook
-  - POST /certify
-  - Body: {file: base64, title: string}
-  ↓
-Node: PhotoCertif (Upload Document)
-  - File: {{$json.file}}
-  - Title: {{$json.title}}
-  ↓
-Node: PhotoCertif (Certify Document)
-  - Storage ID: {{$json.storage_id}}
-  ↓
-Node: Respond to Webhook
-  - Body: {{$json}}
-```
+## 💰 Pricing Information
 
-## 🔐 Security Best Practices
+### PhotoCertif Pricing (Approximate)
 
-1. **Use HTTPS**: Always use HTTPS PhotoCertif URLs
-2. **Dedicated Wallets**: Create separate Solana wallets for n8n automation
-3. **Test on Devnet**: Test workflows on devnet before mainnet
-4. **Monitor Costs**: Track SOL and CHECKHC token consumption
-5. **Rate Limiting**: Add delays between operations to avoid API limits
-6. **Error Handling**: Use "Continue on Fail" for production workflows
+**Services:**
+- **Documents (media/docs)**: ~1 USD per certification
+- **Art (media/image2)**: ~1 USD per certification
 
-## 💰 Costs
-
-### Blockchain Fees (paid in SOL from your wallet)
-- **Upload to Arweave**: ~0.02-0.05 SOL
+**Blockchain Fees (paid in SOL from user wallet):**
+- **Arweave Storage**: ~0.02-0.05 SOL
 - **NFT Minting**: ~0.005 SOL
-- **Total per certification**: ~0.025-0.055 SOL
+- **Total**: ~0.025-0.055 SOL per certification
 
-### PhotoCertif Fees (paid in CHECKHC tokens)
-- **Document Certification**: ~10-15 CHECKHC tokens
-- **Ensure your wallet has sufficient CHECKHC balance**
+**Payment Process:**
+1. Prices are shown in **USD** in config
+2. Converted to **CHECKHC tokens** dynamically
+3. User pays with **CHECKHC** from their balance
+4. Exchange rate: fetched from `/api/pricing/current`
+
+---
+
+## 🎨 Differences: docs vs image2
+
+| Feature | media/docs | media/image2 |
+|---------|------------|--------------|
+| **File Types** | PDF, DOCX, TXT, ZIP | JPG, PNG, GIF, WEBP |
+| **AI Analysis** | ❌ No | ✅ Yes (4 levels) |
+| **AI Fields in Response** | ❌ No | ✅ Yes (5 fields) |
+| **Certification Levels** | N/A | HUMAN_CREATED, LIKELY_HUMAN, LIKELY_AI, AI_GENERATED |
+| **NFT Attributes** | Basic | **Extended** (+ AI scores) |
+| **Price** | ~1 USD | ~1 USD |
+
+**AI Fields (image2 only):**
+- `ai_generated`: Is it AI-generated?
+- `ai_generated_score`: AI probability (0-1)
+- `ai_source`: Certification level
+- `Human_score`: Human probability
+- `ai_prediction_id`: Prediction ID
+
+---
 
 ## 🐛 Troubleshooting
 
 ### "API Key invalid"
 - Verify API key is correct
-- Check API key has required scopes (`docs:*`)
-- Regenerate key if needed
+- Check scopes: `docs:read`, `docs:upload`, `docs:write`
+- Regenerate if needed
 
-### "Insufficient SOL balance"
-- Check wallet has enough SOL for transaction fees
-- Minimum: 0.1 SOL recommended
+### "Certification timeout"
+- User may not have completed payment yet
+- Increase `Max Wait Time` parameter
+- Send reminder notification
 
-### "Insufficient CHECKHC balance"
-- Purchase CHECKHC tokens
-- Check balance: `https://app2.photocertif.com/my-account`
+### "Cannot connect to PhotoCertif"
+- Check URL is accessible: `https://app2.photocertif.com`
+- Verify n8n can reach external networks
+- Check firewall rules
 
-### "Private key invalid"
-- Ensure private key is base58 encoded
-- Test wallet on Solana explorer
-- Use correct network (mainnet/devnet)
+### "Status stays 'uploaded'"
+- Certification form submitted successfully
+- User must pay and mint NFT manually
+- Send link: `/media/docs/certification?iv_storageid=xxx`
 
-### "Certification failed"
-- Check document was uploaded successfully first
-- Verify wallet can sign transactions
-- Check blockchain network status
+---
 
-## 📖 Documentation
+## 🔐 Security Best Practices
+
+1. **API Keys**: Store in n8n credentials (encrypted)
+2. **HTTPS Only**: Always use HTTPS PhotoCertif URLs
+3. **Scope Limitation**: Only grant necessary scopes
+4. **Key Rotation**: Regenerate keys periodically
+5. **Test Environment**: Use test keys for development
+
+---
+
+## 📖 Additional Resources
 
 - **PhotoCertif Docs**: https://photocertif.com/docs
 - **API Reference**: https://photocertif.com/docs/api
 - **n8n Docs**: https://docs.n8n.io
+- **GitHub**: https://github.com/checkhc/n8n-nodes-photocertif
+
+---
 
 ## 🤝 Support
 
@@ -237,10 +389,17 @@ Node: Respond to Webhook
 - **PhotoCertif Support**: support@photocertif.com
 - **n8n Community**: https://community.n8n.io
 
+---
+
 ## 📄 License
 
 MIT License - See LICENSE file for details
 
+---
+
 ## 🎉 Credits
 
 Built by [CheckHC](https://github.com/checkhc) for the PhotoCertif ecosystem.
+
+**Version**: 1.0.0  
+**Last Updated**: 2025-01-06
