@@ -1,0 +1,61 @@
+{
+  "name": "n8n-nodes-photocertif",
+  "version": "1.0.0",
+  "description": "n8n node for PhotoCertif - Document certification on Solana blockchain",
+  "keywords": [
+    "n8n",
+    "n8n-community-node-package",
+    "photocertif",
+    "blockchain",
+    "solana",
+    "nft",
+    "certification",
+    "document"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/checkhc/n8n-nodes-photocertif",
+  "author": {
+    "name": "CheckHC",
+    "email": "contact@checkhc.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/checkhc/n8n-nodes-photocertif.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier credentials nodes --write",
+    "lint": "eslint credentials nodes package.json",
+    "lintfix": "eslint credentials nodes package.json --fix",
+    "prepublishOnly": "npm run build && npm run lint -s"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/PhotoCertifApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/PhotoCertif/PhotoCertif.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-riot": "^1.0.0",
+    "gulp": "^4.0.2",
+    "n8n-workflow": "^1.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.87.6",
+    "axios": "^1.6.0",
+    "bs58": "^5.0.0",
+    "form-data": "^4.0.0"
+  }
+}
