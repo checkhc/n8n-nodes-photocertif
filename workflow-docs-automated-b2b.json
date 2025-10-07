@@ -54,6 +54,54 @@
               "name": "cert_owner",
               "value": "B2B Client Inc",
               "type": "string"
+            },
+            {
+              "id": "social1",
+              "name": "external_url",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "social2",
+              "name": "twitter_url",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "social3",
+              "name": "discord_url",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "social4",
+              "name": "instagram_url",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "social5",
+              "name": "telegram_url",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "social6",
+              "name": "medium_url",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "social7",
+              "name": "wiki_url",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "social8",
+              "name": "youtube_url",
+              "value": "",
+              "type": "string"
             }
           ]
         },
@@ -153,6 +201,38 @@
             {
               "name": "cert_prop",
               "value": "={{ $('Input Data').first().json.cert_owner }}"
+            },
+            {
+              "name": "external_url",
+              "value": "={{ $('Input Data').first().json.external_url || '' }}"
+            },
+            {
+              "name": "twitter_url",
+              "value": "={{ $('Input Data').first().json.twitter_url || '' }}"
+            },
+            {
+              "name": "discord_url",
+              "value": "={{ $('Input Data').first().json.discord_url || '' }}"
+            },
+            {
+              "name": "instagram_url",
+              "value": "={{ $('Input Data').first().json.instagram_url || '' }}"
+            },
+            {
+              "name": "telegram_url",
+              "value": "={{ $('Input Data').first().json.telegram_url || '' }}"
+            },
+            {
+              "name": "medium_url",
+              "value": "={{ $('Input Data').first().json.medium_url || '' }}"
+            },
+            {
+              "name": "wiki_url",
+              "value": "={{ $('Input Data').first().json.wiki_url || '' }}"
+            },
+            {
+              "name": "youtube_url",
+              "value": "={{ $('Input Data').first().json.youtube_url || '' }}"
             }
           ]
         },

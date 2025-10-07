@@ -112,17 +112,57 @@ export class PhotoCertif implements INodeType {
 			// UPLOAD PARAMETERS
 			// ============================================
 			{
-				displayName: 'File',
-				name: 'fileData',
-				type: 'string',
+				displayName: 'Input Type',
+				name: 'inputType',
+				type: 'options',
 				displayOptions: {
 					show: {
 						operation: ['upload'],
 					},
 				},
+				options: [
+					{
+						name: 'Base64 String',
+						value: 'base64',
+						description: 'File content as base64 encoded string',
+					},
+					{
+						name: 'URL',
+						value: 'url',
+						description: 'Download file from URL (Google Drive, Dropbox, etc.)',
+					},
+				],
+				default: 'base64',
+				description: 'How to provide the file content',
+			},
+			{
+				displayName: 'File (Base64)',
+				name: 'fileData',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['upload'],
+						inputType: ['base64'],
+					},
+				},
 				default: '',
-				placeholder: 'Base64 encoded file or binary data reference',
-				description: 'The file to upload (as base64 string or use $binary reference)',
+				placeholder: 'data:image/jpeg;base64,/9j/4AAQ...',
+				description: 'The file to upload as base64 string (with or without data URI prefix)',
+				required: true,
+			},
+			{
+				displayName: 'File URL',
+				name: 'fileUrl',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['upload'],
+						inputType: ['url'],
+					},
+				},
+				default: '',
+				placeholder: 'https://drive.google.com/uc?id=... or https://example.com/image.jpg',
+				description: 'URL to download the file from (must be publicly accessible)',
 				required: true,
 			},
 			{
@@ -420,10 +460,35 @@ export class PhotoCertif implements INodeType {
 				if (operation === 'upload') {
 					const title = this.getNodeParameter('title', i) as string;
 					const description = this.getNodeParameter('description', i, '') as string;
-					const fileData = this.getNodeParameter('fileData', i) as string;
+					const inputType = this.getNodeParameter('inputType', i, 'base64') as string;
 
-					// TODO: Support binary data references like $binary.data
-					// For now, accept base64 strings
+					let fileData: string;
+
+					if (inputType === 'url') {
+						// Download file from URL and convert to base64
+						const fileUrl = this.getNodeParameter('fileUrl', i) as string;
+
+						const fileResponse = await axios.get(fileUrl, {
+							responseType: 'arraybuffer',
+							headers: {
+								'User-Agent': 'n8n-photocertif/1.0',
+							},
+						});
+
+						// Detect content type from response headers or URL extension
+						const contentType = fileResponse.headers['content-type'] || 'application/octet-stream';
+						const base64Data = Buffer.from(fileResponse.data).toString('base64');
+
+						// Add data URI prefix if not present
+						if (base64Data.startsWith('data:')) {
+							fileData = base64Data;
+						} else {
+							fileData = `data:${contentType};base64,${base64Data}`;
+						}
+					} else {
+						// Base64 input
+						fileData = this.getNodeParameter('fileData', i) as string;
+					}
 
 					const response = await axios.post(
 						`${baseUrl}${endpoint}/upload/iv_route`,
