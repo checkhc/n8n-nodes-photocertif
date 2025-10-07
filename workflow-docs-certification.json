@@ -1,0 +1,241 @@
+{
+  "name": "PhotoCertif - Document Certification (media/docs)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "8f5e5e5e-5e5e-5e5e-5e5e-5e5e5e5e5e5e",
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "doc1",
+              "name": "fileBase64",
+              "value": "={{ \"data:application/pdf;base64,JVBERi0xLjQKJeLjz9MKMyAwIG9iago8PC9UeXBlIC9QYWdlCi9QYXJlbnQgMSAwIFIKL01lZGlhQm94IFswIDAgNjEyIDc5Ml0KL0NvbnRlbnRzIDQgMCBSCi9SZXNvdXJjZXMgPDwvUHJvY1NldCBbL1BERiAvVGV4dF0KL0ZvbnQgPDwvRjEgNSAwIFI+Pgo+Pgo+PgplbmRvYmoKNCAwIG9iago8PC9MZW5ndGggNDQ+PgpzdHJlYW0KQlQKL0YxIDI0IFRmCjEwMCA3MDAgVGQKKFRlc3QgRG9jdW1lbnQpIFRqCkVUCmVuZHN0cmVhbQplbmRvYmoKNSAwIG9iago8PC9UeXBlIC9Gb250Ci9TdWJ0eXBlIC9UeXBlMQovQmFzZUZvbnQgL0hlbHZldGljYQo+PgplbmRvYmoKMSAwIG9iago8PC9UeXBlIC9QYWdlcwovS2lkcyBbMyAwIFJdCi9Db3VudCAxCj4+CmVuZG9iagoyIDAgb2JqCjw8L1R5cGUgL0NhdGFsb2cKL1BhZ2VzIDEgMCBSCj4+CmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAyOTYgMDAwMDAgbiAKMDAwMDAwMDM0NSAwMDAwMCBuIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAxMzEgMDAwMDAgbiAKMDAwMDAwMDIyMyAwMDAwMCBuIAp0cmFpbGVyCjw8L1NpemUgNgovUm9vdCAyIDAgUgo+PgpzdGFydHhyZWYKMzk0CiUlRU9G\" }}",
+              "type": "string"
+            },
+            {
+              "id": "doc2",
+              "name": "title",
+              "value": "Test Contract 2025",
+              "type": "string"
+            },
+            {
+              "id": "doc3",
+              "name": "description",
+              "value": "Document test for PhotoCertif workflow",
+              "type": "string"
+            },
+            {
+              "id": "cert1",
+              "name": "cert_name",
+              "value": "Contract2025",
+              "type": "string"
+            },
+            {
+              "id": "cert2",
+              "name": "cert_symbol",
+              "value": "CNTR",
+              "type": "string"
+            },
+            {
+              "id": "cert3",
+              "name": "cert_description",
+              "value": "Official contract certification for 2025",
+              "type": "string"
+            },
+            {
+              "id": "cert4",
+              "name": "cert_owner",
+              "value": "Company ABC Inc",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "test-data-node",
+      "name": "Test Data (Modify Here)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resourceType": "docs",
+        "operation": "getPricing"
+      },
+      "id": "get-pricing-node",
+      "name": "1. Get Pricing",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [
+        680,
+        200
+      ],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "docs",
+        "operation": "upload",
+        "fileData": "={{ $json.fileBase64 }}",
+        "title": "={{ $json.title }}",
+        "description": "={{ $json.description }}"
+      },
+      "id": "upload-node",
+      "name": "2. Upload Document",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [
+        680,
+        400
+      ],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "docs",
+        "operation": "certify",
+        "storageId": "={{ $json.storage_id }}",
+        "name": "={{ $('Test Data (Modify Here)').item.json.cert_name }}",
+        "cert_symbol": "={{ $('Test Data (Modify Here)').item.json.cert_symbol }}",
+        "cert_description": "={{ $('Test Data (Modify Here)').item.json.cert_description }}",
+        "cert_prop": "={{ $('Test Data (Modify Here)').item.json.cert_owner }}"
+      },
+      "id": "certify-node",
+      "name": "3. Submit Certification",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [
+        900,
+        400
+      ],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "docs",
+        "operation": "getStatus",
+        "storageId": "={{ $json.storage_id }}"
+      },
+      "id": "status-node",
+      "name": "4. Check Status",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        400
+      ],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "=## 💰 Pricing Info\n**Type:** {{ $('1. Get Pricing').item.json.type }}\n**Price CHECKHC:** {{ $('1. Get Pricing').item.json.price_checkhc }}\n**Price USD:** ${{ $('1. Get Pricing').item.json.price_usd }}\n**Payment Wallet:** {{ $('1. Get Pricing').item.json.payment_wallet }}\n**Network:** {{ $('1. Get Pricing').item.json.network }}\n\n---\n\n## 📄 Upload Result\n**Storage ID:** {{ $('2. Upload Document').item.json.storage_id }}\n**Status:** {{ $('2. Upload Document').item.json.status }}\n**Hash:** {{ $('2. Upload Document').item.json.hash }}\n\n---\n\n## ✅ Certification Submitted\n**Notice:** {{ $('3. Submit Certification').item.json.notice }}\n**Certification URL:** {{ $('3. Submit Certification').item.json.certification_url }}\n\n👉 **Next Step:** User must complete payment and NFT minting at the URL above\n\n---\n\n## 🔍 Current Status\n**Status:** {{ $('4. Check Status').item.json.status }}\n**Storage ID:** {{ $('4. Check Status').item.json.storage_id }}",
+        "height": 600,
+        "width": 500
+      },
+      "id": "sticky-note",
+      "name": "Results Summary",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        200
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Test Data (Modify Here)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Data (Modify Here)": {
+      "main": [
+        [
+          {
+            "node": "1. Get Pricing",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "2. Upload Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Upload Document": {
+      "main": [
+        [
+          {
+            "node": "3. Submit Certification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Submit Certification": {
+      "main": [
+        [
+          {
+            "node": "4. Check Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "id": "photocertif-docs-workflow",
+  "meta": {
+    "instanceId": "photocertif-dev"
+  },
+  "tags": []
+}

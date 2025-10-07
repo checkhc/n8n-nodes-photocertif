@@ -12,7 +12,7 @@ export class PhotoCertif implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'PhotoCertif',
 		name: 'photoCertif',
-		icon: 'file:photocertif.svg',
+		icon: 'file:photocertif.png',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}} - {{$parameter["resourceType"]}}',
@@ -87,6 +87,12 @@ export class PhotoCertif implements INodeType {
 						value: 'download',
 						description: 'Download certified content',
 						action: 'Download content',
+					},
+					{
+						name: 'Get Pricing',
+						value: 'getPricing',
+						description: 'Get CHECKHC pricing for certification service',
+						action: 'Get pricing',
 					},
 				],
 				default: 'upload',
@@ -565,6 +571,22 @@ export class PhotoCertif implements INodeType {
 
 					const response = await axios.get(
 						`${baseUrl}${endpoint}/download/iv_route?id=${storageId}`,
+						{
+							headers: {
+								'Authorization': `Bearer ${apiKey}`,
+							},
+						},
+					);
+
+					responseData = response.data;
+				}
+
+				// ============================================
+				// GET PRICING OPERATION
+				// ============================================
+				else if (operation === 'getPricing') {
+					const response = await axios.get(
+						`${baseUrl}/api/pricing/service?type=${resourceType}`,
 						{
 							headers: {
 								'Authorization': `Bearer ${apiKey}`,

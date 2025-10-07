@@ -1,0 +1,256 @@
+{
+  "name": "PhotoCertif - Automated B2B Certification (media/image2)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger-img2-auto",
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 400]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "img1",
+              "name": "imageBase64",
+              "value": "={{ \"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCABkAGQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlbaWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/fyiiigAooooAKKKKACiiigAooooAKKKKACiiigD/9k=\" }}",
+              "type": "string"
+            },
+            {
+              "id": "img2",
+              "name": "title",
+              "value": "Automated Art 2025",
+              "type": "string"
+            },
+            {
+              "id": "img3",
+              "name": "description",
+              "value": "B2B automated art certification",
+              "type": "string"
+            },
+            {
+              "id": "cert1",
+              "name": "cert_name",
+              "value": "AutoArt2025",
+              "type": "string"
+            },
+            {
+              "id": "cert2",
+              "name": "cert_symbol",
+              "value": "AART",
+              "type": "string"
+            },
+            {
+              "id": "cert3",
+              "name": "cert_description",
+              "value": "Automated B2B art certification with AI analysis",
+              "type": "string"
+            },
+            {
+              "id": "cert4",
+              "name": "cert_owner",
+              "value": "Art Gallery Inc",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "test-data-img2-auto",
+      "name": "Input Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [460, 400]
+    },
+    {
+      "parameters": {
+        "resourceType": "image2",
+        "operation": "getPricing"
+      },
+      "id": "get-pricing-img2-auto",
+      "name": "1. Get Pricing",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [680, 280],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "image2",
+        "operation": "upload",
+        "fileData": "={{ $json.imageBase64 }}",
+        "title": "={{ $json.title }}",
+        "description": "={{ $json.description }}"
+      },
+      "id": "upload-img2-auto",
+      "name": "2. Upload Image",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [680, 400],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// AUTOMATED SOLANA CHECKHC PAYMENT\n// ============================================\n\nconst { Connection, Keypair, PublicKey, Transaction } = require('@solana/web3.js');\nconst { getAssociatedTokenAddress, createTransferInstruction } = require('@solana/spl-token');\nconst bs58 = require('bs58');\n\n// Get data from previous nodes\nconst pricingData = $('1. Get Pricing').first().json;\nconst uploadData = $('2. Upload Image').first().json;\nconst inputData = $('Input Data').first().json;\n\n// Configuration\nconst RPC_URL = 'https://api.mainnet-beta.solana.com';\nconst CHECKHC_MINT = new PublicKey(pricingData.checkhc_mint);\nconst PAYMENT_WALLET = new PublicKey(pricingData.payment_wallet);\nconst AMOUNT_CHECKHC = pricingData.price_checkhc;\n\n// Get private key from credentials\nconst credentials = await this.getCredentials('solanaWallet');\nconst privateKeyBase58 = credentials.privateKey;\nconst payerKeypair = Keypair.fromSecretKey(bs58.decode(privateKeyBase58));\n\nconsole.log('Payer wallet:', payerKeypair.publicKey.toString());\nconsole.log('Payment amount:', AMOUNT_CHECKHC, 'CHECKHC');\nconsole.log('Payment to:', PAYMENT_WALLET.toString());\n\n// Connect to Solana\nconst connection = new Connection(RPC_URL, 'confirmed');\n\n// Get associated token accounts\nconst payerTokenAccount = await getAssociatedTokenAddress(\n  CHECKHC_MINT,\n  payerKeypair.publicKey\n);\n\nconst recipientTokenAccount = await getAssociatedTokenAddress(\n  CHECKHC_MINT,\n  PAYMENT_WALLET\n);\n\nconsole.log('Payer token account:', payerTokenAccount.toString());\nconsole.log('Recipient token account:', recipientTokenAccount.toString());\n\n// Check balance\nconst balance = await connection.getTokenAccountBalance(payerTokenAccount);\nconsole.log('Current balance:', balance.value.uiAmount, 'CHECKHC');\n\nif (balance.value.uiAmount < AMOUNT_CHECKHC) {\n  throw new Error(`Insufficient CHECKHC balance. Need ${AMOUNT_CHECKHC}, have ${balance.value.uiAmount}`);\n}\n\n// Convert CHECKHC to raw amount (6 decimals)\nconst amountRaw = Math.floor(AMOUNT_CHECKHC * 1000000);\n\nconsole.log('Amount raw:', amountRaw);\n\n// Create transfer instruction\nconst transferInstruction = createTransferInstruction(\n  payerTokenAccount,\n  recipientTokenAccount,\n  payerKeypair.publicKey,\n  amountRaw\n);\n\n// Get recent blockhash\nconst { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');\n\n// Create and sign transaction\nconst transaction = new Transaction();\ntransaction.recentBlockhash = blockhash;\ntransaction.feePayer = payerKeypair.publicKey;\ntransaction.add(transferInstruction);\ntransaction.sign(payerKeypair);\n\nconsole.log('Transaction signed');\n\n// Send transaction\nconst signature = await connection.sendRawTransaction(\n  transaction.serialize(),\n  { skipPreflight: false, preflightCommitment: 'confirmed' }\n);\n\nconsole.log('Transaction sent:', signature);\n\n// Wait for confirmation\nconst confirmation = await connection.confirmTransaction(\n  {\n    signature,\n    blockhash,\n    lastValidBlockHeight\n  },\n  'confirmed'\n);\n\nif (confirmation.value.err) {\n  throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);\n}\n\nconsole.log('Payment confirmed!');\n\n// Return data\nreturn {\n  payment_signature: signature,\n  payment_amount: AMOUNT_CHECKHC,\n  payment_wallet: PAYMENT_WALLET.toString(),\n  payer_wallet: payerKeypair.publicKey.toString(),\n  storage_id: uploadData.storage_id,\n  checkhc_mint: pricingData.checkhc_mint,\n  confirmed: true,\n  confirmation_url: `https://solscan.io/tx/${signature}`\n};"
+      },
+      "id": "payment-img2-code",
+      "name": "3. Pay with CHECKHC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('1. Get Pricing').first().json.base_url || 'https://localhost' }}/api/storage/image2/certify-with-payment",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "photoCertifApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "storage_id",
+              "value": "={{ $('2. Upload Image').first().json.storage_id }}"
+            },
+            {
+              "name": "payment_signature",
+              "value": "={{ $json.payment_signature }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $('Input Data').first().json.cert_name }}"
+            },
+            {
+              "name": "cert_symbol",
+              "value": "={{ $('Input Data').first().json.cert_symbol }}"
+            },
+            {
+              "name": "cert_description",
+              "value": "={{ $('Input Data').first().json.cert_description }}"
+            },
+            {
+              "name": "cert_prop",
+              "value": "={{ $('Input Data').first().json.cert_owner }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "certify-payment-img2",
+      "name": "4. Certify with Payment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 400],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "=## 🤖 AUTOMATED B2B WORKFLOW - ART\n\n**Fully automated art certification** - AI analysis + permanent storage!\n\n---\n\n## 💰 Pricing\n**Type:** {{ $('1. Get Pricing').item.json.type }}\n**Price:** {{ $('1. Get Pricing').item.json.price_checkhc }} CHECKHC (~${{ $('1. Get Pricing').item.json.price_usd }})\n**Payment Wallet:** {{ $('1. Get Pricing').item.json.payment_wallet }}\n\n---\n\n## 🖼️ Upload\n**Storage ID:** {{ $('2. Upload Image').item.json.storage_id }}\n**Hash:** {{ $('2. Upload Image').item.json.hash }}\n**Status:** {{ $('2. Upload Image').item.json.status }}\n\n---\n\n## 💳 Payment\n**Transaction:** {{ $('3. Pay with CHECKHC').item.json.payment_signature }}\n**Amount:** {{ $('3. Pay with CHECKHC').item.json.payment_amount }} CHECKHC\n**From:** {{ $('3. Pay with CHECKHC').item.json.payer_wallet }}\n**To:** {{ $('3. Pay with CHECKHC').item.json.payment_wallet }}\n**Status:** ✅ Confirmed\n**Solscan:** {{ $('3. Pay with CHECKHC').item.json.confirmation_url }}\n\n---\n\n## 🎨 NFT Certification\n**Status:** {{ $('4. Certify with Payment').item.json.status }}\n**NFT Mint:** {{ $('4. Certify with Payment').item.json.nft_mint }}\n**Transaction:** {{ $('4. Certify with Payment').item.json.transaction_signature }}\n**Owner:** {{ $('4. Certify with Payment').item.json.owner_wallet }}\n**AI Analysis:** {{ $('4. Certify with Payment').item.json.ai_source || 'Processing...' }}\n**PRNU Score:** {{ $('4. Certify with Payment').item.json.prnu_score || 'N/A' }}\n\n**View NFT:** https://solscan.io/token/{{ $('4. Certify with Payment').item.json.nft_mint }}\n\n**Features:**\n- ✅ AI Analysis (4 levels)\n- ✅ Permanent Arweave storage\n- ✅ PRNU camera fingerprint\n- ✅ Watermark certification\n\n---\n\n## ✅ COMPLETED!\n\n**Total Time:** ~60-90 seconds\n**Human Intervention:** ZERO 🚀",
+        "height": 900,
+        "width": 600,
+        "color": 4
+      },
+      "id": "results-img2-auto",
+      "name": "Results Summary",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1360, 200]
+    },
+    {
+      "parameters": {
+        "content": "=## ⚙️ AUTOMATED ART CERTIFICATION\n\n### 📋 Requirements:\n1. **PhotoCertif API Credentials**\n   - URL: https://localhost or https://app2.photocertif.com\n   - API Key: pk_live_xxxxx\n\n2. **Solana Wallet Credentials**\n   - Private Key (base58)\n   - Must have CHECKHC balance (~525 CHECKHC)\n   - Automated payment enabled\n\n### 🎨 Features (media/image2):\n- AI Analysis with 4 authenticity levels\n- Permanent Arweave storage (not IPFS)\n- PRNU camera fingerprint verification\n- Watermark certification\n- Server-side NFT minting\n\n### 🔧 Setup:\n1. Configure both credentials in n8n\n2. Modify \"Input Data\" with your image\n3. Click \"Test workflow\"\n4. Wait ~90 seconds\n5. NFT created automatically!\n\n### 🎯 Use Case:\nArt galleries, photographers, digital artists - Certify collections without manual intervention.\n\n### ⚠️ Price:\n~525 CHECKHC (~$3) per certification",
+        "height": 580,
+        "width": 450,
+        "color": 5
+      },
+      "id": "info-img2-auto",
+      "name": "Workflow Info",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [240, 620]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [[
+        {
+          "node": "Input Data",
+          "type": "main",
+          "index": 0
+        }
+      ]]
+    },
+    "Input Data": {
+      "main": [[
+        {
+          "node": "1. Get Pricing",
+          "type": "main",
+          "index": 0
+        },
+        {
+          "node": "2. Upload Image",
+          "type": "main",
+          "index": 0
+        }
+      ]]
+    },
+    "2. Upload Image": {
+      "main": [[
+        {
+          "node": "3. Pay with CHECKHC",
+          "type": "main",
+          "index": 0
+        }
+      ]]
+    },
+    "3. Pay with CHECKHC": {
+      "main": [[
+        {
+          "node": "4. Certify with Payment",
+          "type": "main",
+          "index": 0
+        }
+      ]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "id": "photocertif-image2-automated-b2b",
+  "meta": {
+    "instanceId": "photocertif-automated-b2b"
+  },
+  "tags": []
+}

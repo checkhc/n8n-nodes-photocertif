@@ -24,3 +24,9 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+
+# Package archives
+*.tgz
+
+# Backups
+*.backup

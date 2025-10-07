@@ -50,11 +50,6 @@ export class PhotoCertifApi implements ICredentialType {
 		},
 	};
 
-	test: ICredentialTestRequest = {
-		request: {
-			baseURL: '={{$credentials.photoCertifUrl}}',
-			url: '/api/collections/list',
-			method: 'GET',
-		},
-	};
+	// Disable credential test - PhotoCertif API requires storage_id for most endpoints
+	// The API key will be validated on first actual operation
 }
