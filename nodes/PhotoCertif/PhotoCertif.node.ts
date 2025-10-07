@@ -122,18 +122,33 @@ export class PhotoCertif implements INodeType {
 				},
 				options: [
 					{
+						name: 'URL',
+						value: 'url',
+						description: 'Download file from URL (Google Drive, Dropbox, CDN, etc.)',
+					},
+					{
 						name: 'Base64 String',
 						value: 'base64',
 						description: 'File content as base64 encoded string',
 					},
-					{
-						name: 'URL',
-						value: 'url',
-						description: 'Download file from URL (Google Drive, Dropbox, etc.)',
-					},
 				],
-				default: 'base64',
+				default: 'url',
 				description: 'How to provide the file content',
+			},
+			{
+				displayName: 'File URL',
+				name: 'fileUrl',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['upload'],
+						inputType: ['url'],
+					},
+				},
+				default: '',
+				placeholder: 'https://drive.google.com/uc?id=FILE_ID&export=download',
+				description: 'Public URL to download the file from (Google Drive, Dropbox, or direct link)',
+				required: true,
 			},
 			{
 				displayName: 'File (Base64)',
@@ -147,22 +162,7 @@ export class PhotoCertif implements INodeType {
 				},
 				default: '',
 				placeholder: 'data:image/jpeg;base64,/9j/4AAQ...',
-				description: 'The file to upload as base64 string (with or without data URI prefix)',
-				required: true,
-			},
-			{
-				displayName: 'File URL',
-				name: 'fileUrl',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['upload'],
-						inputType: ['url'],
-					},
-				},
-				default: '',
-				placeholder: 'https://drive.google.com/uc?id=... or https://example.com/image.jpg',
-				description: 'URL to download the file from (must be publicly accessible)',
+				description: 'File as base64 string (with or without data URI prefix)',
 				required: true,
 			},
 			{
