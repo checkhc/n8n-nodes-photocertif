@@ -6,8 +6,11 @@ Custom n8n node for **PhotoCertif** - Document and Art certification on Solana b
 
 ### **Core Operations**
 - **📤 Upload Documents & Images** - Upload content for secure storage
+  - ⭐ **NEW**: URL Support - Upload from Google Drive, Dropbox, or any public URL
+  - Base64 encoding - Traditional method with base64 strings
 - **💰 Get Pricing** - Retrieve current CHECKHC pricing in real-time
 - **📝 Submit Certification** - Prepare certification with all metadata
+  - ✅ All optional fields supported (social links, collection, etc.)
 - **🔍 Get Status** - Monitor certification progress
 - **⏳ Wait for Certification** - Poll status until completion (with timeout)
 - **📥 Download Content** - Retrieve certified files
@@ -145,15 +148,31 @@ Get current CHECKHC pricing for certification services.
 
 ---
 
-### **2. Upload**
+### **2. Upload** ⭐ Enhanced with URL Support
 
 Upload a document or image to PhotoCertif.
 
 **Parameters:**
 - **Resource Type**: `docs` (documents) or `image2` (art)
-- **File**: Base64 encoded content
+- **Input Type** ⭐ NEW:
+  - `Base64 String` - Traditional base64 encoded content
+  - `URL` - Download from Google Drive, Dropbox, or any public URL
+- **File (Base64)**: Base64 encoded content (if Input Type = Base64)
+- **File URL**: Public URL to download file from (if Input Type = URL)
 - **Title**: Content title (required)
 - **Description**: Optional description
+
+**URL Examples:**
+```javascript
+// Google Drive
+"https://drive.google.com/uc?id=FILE_ID&export=download"
+
+// Dropbox
+"https://www.dropbox.com/s/abc123/photo.jpg?dl=1"
+
+// Direct URL
+"https://cdn.example.com/images/photo.jpg"
+```
 
 **Returns:**
 ```json
@@ -471,6 +490,7 @@ Built by [CheckHC](https://github.com/checkhc) for the PhotoCertif ecosystem.
 ## 📖 Documentation
 
 - **[QUICK_START.md](./QUICK_START.md)** - 5-minute setup guide
+- **[URL_SUPPORT_GUIDE.md](./URL_SUPPORT_GUIDE.md)** ⭐ NEW - Upload files from Google Drive, Dropbox, URLs
 - **[SOLANA_WALLET_SETUP.md](./SOLANA_WALLET_SETUP.md)** - Solana Wallet configuration
 - **[AUTOMATED_B2B_GUIDE.md](./AUTOMATED_B2B_GUIDE.md)** - Complete B2B automation guide
 - **[N8N_INTEGRATION_GUIDE.md](./N8N_INTEGRATION_GUIDE.md)** - Technical integration documentation
@@ -494,5 +514,21 @@ Built by [CheckHC](https://github.com/checkhc) for the PhotoCertif ecosystem.
 
 ---
 
-**Version**: 2.0.0  
+**Version**: 2.1.0  
 **Last Updated**: 2025-10-07
+
+---
+
+## 🆕 What's New in v2.1
+
+### **URL Upload Support**
+- Upload files directly from URLs (Google Drive, Dropbox, CDN)
+- No more manual base64 encoding required
+- Automatic content-type detection and conversion
+
+### **Complete Social Links**
+- All 8 optional social link fields now included in workflows
+- Twitter/X, Discord, Instagram, Telegram, Medium, Wiki, YouTube
+- Full NFT metadata support
+
+See **[URL_SUPPORT_GUIDE.md](./URL_SUPPORT_GUIDE.md)** for complete documentation.
