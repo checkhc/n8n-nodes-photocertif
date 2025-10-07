@@ -81,16 +81,27 @@ Restart n8n after installation.
 
 ---
 
-### Credential 2: Solana Wallet ⭐ NEW (Optional - For Automated Workflows)
+### Credential 2: Solana Credentials ⭐ NEW (Optional - For Automated Workflows)
 
 **Required for**: Automated B2B workflows with automatic payment
 
+**Two options available** (both work):
+
+#### **Option A: Solana Wallet** (PhotoCertif dedicated)
 1. Open n8n → **Credentials** → **New Credential**
 2. Search for "**Solana Wallet**"
 3. Fill in:
    - **Private Key**: Your Solana wallet private key (base58 format)
    - **Network**: `Mainnet` (or Devnet for testing)
    - **RPC URL**: `https://api.mainnet-beta.solana.com` (or use private RPC)
+
+#### **Option B: Solana API** (Reuse from n8n-nodes-solana-swap)
+If you already have Solana credentials from `n8n-nodes-solana-swap`:
+1. Open n8n → **Credentials** → Select existing "**Solana API**"
+2. PhotoCertif node will automatically detect and use:
+   - **Private Key** → For signing transactions
+   - **Network** + **RPC URL** → For blockchain connection
+   - **No additional configuration needed** ✅
 
 **⚠️ Security Recommendations:**
 - Use a **dedicated wallet** for n8n (not your main wallet)

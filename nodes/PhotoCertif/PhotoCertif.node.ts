@@ -37,6 +37,13 @@ export class PhotoCertif implements INodeType {
 					show: {},
 				},
 			},
+			{
+				name: 'solanaApi',
+				required: false,
+				displayOptions: {
+					show: {},
+				},
+			},
 		],
 		properties: [
 			// Resource Type
