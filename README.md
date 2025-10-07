@@ -1,35 +1,52 @@
 # n8n-nodes-photocertif
 
-Custom n8n node for **PhotoCertif** - Document and Art certification on Solana blockchain.
+Custom n8n node for **PhotoCertif** - Document and Art certification on Solana blockchain with **fully automated B2B workflows**.
 
 ## 🎯 Features
 
+### **Core Operations**
 - **📤 Upload Documents & Images** - Upload content for secure storage
+- **💰 Get Pricing** - Retrieve current CHECKHC pricing in real-time
 - **📝 Submit Certification** - Prepare certification with all metadata
 - **🔍 Get Status** - Monitor certification progress
 - **⏳ Wait for Certification** - Poll status until completion (with timeout)
 - **📥 Download Content** - Retrieve certified files
 - **🎨 AI Analysis** - Automatic AI detection for art certification (media/image2)
-- **🔐 Secure API Keys** - Credentials stored encrypted in n8n
 
-## ⚠️ Important Limitations
+### **🚀 NEW: Automated B2B Workflows (v2.0)**
+- **💳 Automated CHECKHC Payment** - Pay from n8n using Solana Wallet credential
+- **🤖 Server-Side NFT Minting** - NFT created and transferred automatically
+- **⚡ Zero Human Intervention** - Complete end-to-end automation
+- **🔐 Secure Credential Storage** - API Keys + Solana Wallet encrypted in n8n
 
-This node **prepares** certifications but does NOT:
-- ❌ Pay CHECKHC fees automatically (requires user wallet)
-- ❌ Mint NFT automatically (requires blockchain signature)
-- ❌ Complete certification without user intervention
+## 🎭 Two Workflow Types
 
-**The user must:**
-1. Connect their Solana wallet in PhotoCertif web interface
-2. Approve payment (~1 USD equivalent in CHECKHC)
-3. Sign NFT minting transaction
+### **1. Manual Workflows** (User Completes Payment)
+Perfect for individual users or small batches:
+- ✅ n8n uploads and prepares certification
+- ⏸️ User completes payment in PhotoCertif web interface
+- ✅ n8n monitors and detects completion
 
 **Use Cases:**
-- ✅ Bulk upload automation
-- ✅ Automated certification form submission
-- ✅ Status monitoring and reporting
-- ✅ Post-certification workflows
-- ❌ Fully automatic end-to-end certification (not possible without wallet)
+- Individual document certification
+- Small batches with manual approval
+- User-controlled payment process
+
+---
+
+### **2. Automated B2B Workflows** ⭐ NEW
+Perfect for enterprise and high-volume automation:
+- ✅ n8n uploads content
+- ✅ n8n pays automatically with CHECKHC (from Solana Wallet)
+- ✅ PhotoCertif mints NFT server-side
+- ✅ NFT transferred to payer wallet
+- ✅ **100% automated - ZERO manual intervention**
+
+**Use Cases:**
+- High-volume document certification (100s-1000s)
+- B2B integrations
+- Automated certification pipelines
+- Enterprise compliance workflows
 
 ---
 
@@ -55,32 +72,90 @@ Restart n8n after installation.
 
 ## 🔑 Configuration
 
-### Create Credential
+### Credential 1: PhotoCertif API (Required)
 
-1. Open n8n
-2. **Credentials** → **New Credential**
-3. Search for "**PhotoCertif API**"
-4. Fill in:
-   - **PhotoCertif URL**: `https://app2.photocertif.com`
+1. Open n8n → **Credentials** → **New Credential**
+2. Search for "**PhotoCertif API**"
+3. Fill in:
+   - **PhotoCertif URL**: `https://localhost` (dev) or `https://app2.photocertif.com` (prod)
    - **API Key**: `pk_live_xxxxxxxxxxxxx`
 
-### Generate API Key
-
+**Generate API Key:**
 1. Go to https://app2.photocertif.com
-2. Login to your account
-3. Navigate to **My Account** → **API Keys**
-4. Click **Create API Key**
-5. Select scopes:
-   - `docs:read` - Get status, download
-   - `docs:upload` - Upload files
-   - `docs:write` - Submit certifications
-6. Copy the API key (starts with `pk_live_` or `pk_test_`)
+2. Login → **My Account** → **API Keys** → **Create API Key**
+3. Select scopes: `docs:read`, `docs:upload`, `docs:write`
+4. Copy the API key (starts with `pk_live_` or `pk_test_`)
+
+---
+
+### Credential 2: Solana Wallet ⭐ NEW (Optional - For Automated Workflows)
+
+**Required for**: Automated B2B workflows with automatic payment
+
+1. Open n8n → **Credentials** → **New Credential**
+2. Search for "**Solana Wallet**"
+3. Fill in:
+   - **Private Key**: Your Solana wallet private key (base58 format)
+   - **Network**: `Mainnet` (or Devnet for testing)
+   - **RPC URL**: `https://api.mainnet-beta.solana.com` (or use private RPC)
+
+**⚠️ Security Recommendations:**
+- Use a **dedicated wallet** for n8n (not your main wallet)
+- Store only the **necessary CHECKHC tokens** (~1000-10000 for testing)
+- The private key is **encrypted** in n8n credentials
+- **Never share** your private key
+
+**Get a Private Key:**
+
+**Option A - Export from Phantom:**
+```
+1. Open Phantom → Settings → Security & Privacy
+2. Export Private Key → Copy (base58 format)
+```
+
+**Option B - Create new wallet:**
+```bash
+node -e "
+const {Keypair} = require('@solana/web3.js');
+const bs58 = require('bs58');
+const k = Keypair.generate();
+console.log('Address:', k.publicKey.toString());
+console.log('Private Key:', bs58.encode(k.secretKey));
+"
+```
+
+**Fund the Wallet:**
+- Buy CHECKHC tokens: https://jup.ag/swap/SOL-CHECKHC
+- Send to your n8n wallet address
+- Recommended: 500-10000 CHECKHC (~$3-50)
 
 ---
 
 ## 📚 Operations
 
-### **1. Upload**
+### **1. Get Pricing** ⭐ NEW
+
+Get current CHECKHC pricing for certification services.
+
+**Parameters:**
+- **Resource Type**: `docs` or `image2`
+
+**Returns:**
+```json
+{
+  "success": true,
+  "type": "docs",
+  "price_checkhc": 175.48,
+  "price_usd": 1.0,
+  "checkhc_mint": "5tpkr...49uau",
+  "payment_wallet": "C6bK...hESFg",
+  "network": "mainnet-beta"
+}
+```
+
+---
+
+### **2. Upload**
 
 Upload a document or image to PhotoCertif.
 
@@ -101,7 +176,7 @@ Upload a document or image to PhotoCertif.
 
 ---
 
-### **2. Submit Certification**
+### **3. Submit Certification**
 
 Submit certification form with all metadata. **Note:** User must complete payment and minting in PhotoCertif interface.
 
@@ -401,5 +476,31 @@ MIT License - See LICENSE file for details
 
 Built by [CheckHC](https://github.com/checkhc) for the PhotoCertif ecosystem.
 
-**Version**: 1.0.0  
-**Last Updated**: 2025-01-06
+---
+
+## 📖 Documentation
+
+- **[QUICK_START.md](./QUICK_START.md)** - 5-minute setup guide
+- **[SOLANA_WALLET_SETUP.md](./SOLANA_WALLET_SETUP.md)** - Solana Wallet configuration
+- **[AUTOMATED_B2B_GUIDE.md](./AUTOMATED_B2B_GUIDE.md)** - Complete B2B automation guide
+- **[WORKFLOWS_README.md](./WORKFLOWS_README.md)** - Workflow examples
+- **[CHANGELOG_V2.md](./CHANGELOG_V2.md)** - What's new in v2.0
+
+---
+
+## 🎯 Example Workflows Included
+
+### **Automated B2B Workflows** (v2.0):
+- `workflow-docs-automated-b2b.json` - Fully automated document certification
+- `workflow-image2-automated-b2b.json` - Fully automated art certification
+
+### **Manual Workflows**:
+- `workflow-docs-certification.json` - Manual document certification
+- `workflow-image2-certification.json` - Manual art certification
+
+**Import**: n8n → Workflows → Import from File
+
+---
+
+**Version**: 2.0.0  
+**Last Updated**: 2025-10-07
