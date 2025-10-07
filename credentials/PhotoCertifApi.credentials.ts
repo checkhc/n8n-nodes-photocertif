@@ -53,7 +53,7 @@ export class PhotoCertifApi implements ICredentialType {
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: '={{$credentials.photoCertifUrl}}',
-			url: '/api/user/profile',
+			url: '/api/storage/docs/status?id=test_connection',
 			method: 'GET',
 		},
 	};
