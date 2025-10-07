@@ -19,34 +19,24 @@ Custom n8n node for **PhotoCertif** - Document and Art certification on Solana b
 - **⚡ Zero Human Intervention** - Complete end-to-end automation
 - **🔐 Secure Credential Storage** - API Keys + Solana Wallet encrypted in n8n
 
-## 🎭 Two Workflow Types
+## 🚀 Fully Automated B2B Workflows
 
-### **1. Manual Workflows** (User Completes Payment)
-Perfect for individual users or small batches:
-- ✅ n8n uploads and prepares certification
-- ⏸️ User completes payment in PhotoCertif web interface
-- ✅ n8n monitors and detects completion
+**Complete end-to-end automation** with zero human intervention:
 
-**Use Cases:**
-- Individual document certification
-- Small batches with manual approval
-- User-controlled payment process
-
----
-
-### **2. Automated B2B Workflows** ⭐ NEW
-Perfect for enterprise and high-volume automation:
-- ✅ n8n uploads content
-- ✅ n8n pays automatically with CHECKHC (from Solana Wallet)
-- ✅ PhotoCertif mints NFT server-side
-- ✅ NFT transferred to payer wallet
-- ✅ **100% automated - ZERO manual intervention**
+- ✅ **Upload** - n8n uploads documents/images to PhotoCertif
+- ✅ **Get Pricing** - Retrieves current CHECKHC pricing in real-time
+- ✅ **Pay Automatically** - n8n pays with CHECKHC from Solana Wallet credential
+- ✅ **Mint NFT** - PhotoCertif mints NFT server-side automatically
+- ✅ **Transfer** - NFT transferred to payer wallet
+- ✅ **Monitor** - Check status and completion
 
 **Use Cases:**
-- High-volume document certification (100s-1000s)
-- B2B integrations
-- Automated certification pipelines
-- Enterprise compliance workflows
+- 📄 High-volume document certification (100s-1000s)
+- 🎨 Art collection certification and authentication
+- 🏢 B2B integrations and partnerships
+- 🔄 Automated certification pipelines
+- ✅ Enterprise compliance workflows
+- 📊 Batch processing with monitoring
 
 ---
 
@@ -483,22 +473,24 @@ Built by [CheckHC](https://github.com/checkhc) for the PhotoCertif ecosystem.
 - **[QUICK_START.md](./QUICK_START.md)** - 5-minute setup guide
 - **[SOLANA_WALLET_SETUP.md](./SOLANA_WALLET_SETUP.md)** - Solana Wallet configuration
 - **[AUTOMATED_B2B_GUIDE.md](./AUTOMATED_B2B_GUIDE.md)** - Complete B2B automation guide
-- **[WORKFLOWS_README.md](./WORKFLOWS_README.md)** - Workflow examples
+- **[N8N_INTEGRATION_GUIDE.md](./N8N_INTEGRATION_GUIDE.md)** - Technical integration documentation
 - **[CHANGELOG_V2.md](./CHANGELOG_V2.md)** - What's new in v2.0
 
 ---
 
 ## 🎯 Example Workflows Included
 
-### **Automated B2B Workflows** (v2.0):
+### **Automated B2B Workflows**:
 - `workflow-docs-automated-b2b.json` - Fully automated document certification
 - `workflow-image2-automated-b2b.json` - Fully automated art certification
 
-### **Manual Workflows**:
-- `workflow-docs-certification.json` - Manual document certification
-- `workflow-image2-certification.json` - Manual art certification
-
 **Import**: n8n → Workflows → Import from File
+
+**Features**:
+- ✅ 100% automated payment with Solana Wallet credential
+- ✅ Server-side NFT minting
+- ✅ Zero human intervention required
+- ✅ Perfect for high-volume B2B integrations
 
 ---
 
