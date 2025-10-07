@@ -37,7 +37,8 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/PhotoCertifApi.credentials.js"
+      "dist/credentials/PhotoCertifApi.credentials.js",
+      "dist/credentials/SolanaWallet.credentials.js"
     ],
     "nodes": [
       "dist/nodes/PhotoCertif/PhotoCertif.node.js"
@@ -53,6 +54,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@solana/spl-token": "^0.3.9",
     "@solana/web3.js": "^1.87.6",
     "axios": "^1.6.0",
     "bs58": "^5.0.0",
