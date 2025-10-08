@@ -8,6 +8,52 @@ import {
 
 import axios from 'axios';
 
+// Security and Performance Constants
+const REQUEST_TIMEOUT = 30000;          // 30 seconds for API requests
+const DOWNLOAD_TIMEOUT = 120000;        // 2 minutes for file downloads
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB maximum file size
+const MIN_POLLING_INTERVAL = 10;        // 10 seconds minimum polling interval
+
+/**
+ * Validates URL to prevent SSRF (Server-Side Request Forgery) attacks
+ * Blocks access to internal/private IPs and non-HTTP(S) protocols
+ * @param urlString - URL to validate
+ * @throws Error if URL is invalid or points to blocked resources
+ */
+function validateUrl(urlString: string): void {
+	let url: URL;
+	try {
+		url = new URL(urlString);
+	} catch {
+		throw new Error('Invalid URL format');
+	}
+	
+	// Only allow HTTP and HTTPS protocols
+	if (!['http:', 'https:'].includes(url.protocol)) {
+		throw new Error(`Protocol ${url.protocol} not allowed. Use HTTP or HTTPS only.`);
+	}
+	
+	const hostname = url.hostname.toLowerCase();
+	
+	// Block internal/localhost IPs
+	const blockedHosts = [
+		'localhost',
+		'127.0.0.1',
+		'0.0.0.0',
+		'::1',
+		'169.254.169.254', // AWS metadata endpoint
+	];
+	
+	if (blockedHosts.includes(hostname)) {
+		throw new Error('Access to internal/private IPs is not allowed');
+	}
+	
+	// Block private IP ranges (10.x.x.x, 172.16-31.x.x, 192.168.x.x)
+	if (/^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.)/.test(hostname)) {
+		throw new Error('Access to private IP ranges is not allowed');
+	}
+}
+
 export class PhotoCertif implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'PhotoCertif',
@@ -490,8 +536,22 @@ export class PhotoCertif implements INodeType {
 						// Download file from URL and convert to base64
 						const fileUrl = this.getNodeParameter('fileUrl', i) as string;
 
+						// SECURITY: Validate URL to prevent SSRF attacks
+						try {
+							validateUrl(fileUrl);
+						} catch (error: any) {
+							throw new NodeOperationError(
+								this.getNode(),
+								`Invalid URL: ${error.message}`,
+								{ itemIndex: i },
+							);
+						}
+
 						const fileResponse = await axios.get(fileUrl, {
+							timeout: DOWNLOAD_TIMEOUT,
 							responseType: 'arraybuffer',
+							maxContentLength: MAX_FILE_SIZE,
+							maxBodyLength: MAX_FILE_SIZE,
 							headers: {
 								'User-Agent': 'n8n-photocertif/1.0',
 							},
@@ -527,6 +587,7 @@ export class PhotoCertif implements INodeType {
 						`${baseUrl}${endpoint}/upload/iv_route`,
 						requestBody,
 						{
+							timeout: REQUEST_TIMEOUT,
 							headers: {
 								'Authorization': `Bearer ${apiKey}`,
 								'Content-Type': 'application/json',
@@ -546,6 +607,7 @@ export class PhotoCertif implements INodeType {
 					const response = await axios.get(
 						`${baseUrl}${endpoint}/status/iv_route?id=${storageId}`,
 						{
+							timeout: REQUEST_TIMEOUT,
 							headers: {
 								'Authorization': `Bearer ${apiKey}`,
 							},
@@ -596,6 +658,7 @@ export class PhotoCertif implements INodeType {
 							youtube_url,
 						},
 						{
+							timeout: REQUEST_TIMEOUT,
 							headers: {
 								'Authorization': `Bearer ${apiKey}`,
 								'Content-Type': 'application/json',
@@ -615,7 +678,11 @@ export class PhotoCertif implements INodeType {
 				// ============================================
 				else if (operation === 'waitForCertification') {
 					const storageId = this.getNodeParameter('storageId', i) as string;
-					const pollingInterval = this.getNodeParameter('pollingInterval', i, 300) as number;
+					// SECURITY: Enforce minimum polling interval to prevent API spam
+					const pollingInterval = Math.max(
+						MIN_POLLING_INTERVAL,
+						this.getNodeParameter('pollingInterval', i, 300) as number
+					);
 					const maxWaitTime = this.getNodeParameter('maxWaitTime', i, 86400) as number;
 
 					const startTime = Date.now();
@@ -631,6 +698,7 @@ export class PhotoCertif implements INodeType {
 						const statusResponse = await axios.get(
 							`${baseUrl}${endpoint}/status/iv_route?id=${storageId}`,
 							{
+								timeout: REQUEST_TIMEOUT,
 								headers: {
 									'Authorization': `Bearer ${apiKey}`,
 								},
@@ -676,6 +744,7 @@ export class PhotoCertif implements INodeType {
 					const response = await axios.get(
 						`${baseUrl}${endpoint}/download/iv_route?id=${storageId}`,
 						{
+							timeout: REQUEST_TIMEOUT,
 							headers: {
 								'Authorization': `Bearer ${apiKey}`,
 							},
@@ -692,6 +761,7 @@ export class PhotoCertif implements INodeType {
 					const response = await axios.get(
 						`${baseUrl}/api/pricing/service?type=${resourceType}`,
 						{
+							timeout: REQUEST_TIMEOUT,
 							headers: {
 								'Authorization': `Bearer ${apiKey}`,
 							},
@@ -720,9 +790,10 @@ export class PhotoCertif implements INodeType {
 				if (this.continueOnFail()) {
 					returnData.push({
 						json: {
-							error: error.message || 'Unknown error',
+							error: 'Request failed',
 							status_code: error.response?.status,
-							details: error.response?.data,
+							// SECURITY: Do not expose full response data (may contain sensitive info)
+							message: error.response?.data?.error || error.message || 'Unknown error',
 						},
 						pairedItem: { item: i },
 					});
