@@ -122,7 +122,7 @@
       "name": "1. Get Pricing",
       "type": "n8n-nodes-photocertif.photoCertif",
       "typeVersion": 1,
-      "position": [680, 280],
+      "position": [680, 400],
       "credentials": {
         "photoCertifApi": {
           "id": "1",
@@ -143,7 +143,7 @@
       "name": "2. Upload Image",
       "type": "n8n-nodes-photocertif.photoCertif",
       "typeVersion": 1,
-      "position": [680, 400],
+      "position": [900, 400],
       "credentials": {
         "photoCertifApi": {
           "id": "1",
@@ -159,7 +159,7 @@
       "name": "3. Pay with CHECKHC",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [900, 400]
+      "position": [1120, 400]
     },
     {
       "parameters": {
@@ -245,7 +245,7 @@
       "name": "4. Certify with Payment",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1120, 400],
+      "position": [1340, 400],
       "credentials": {
         "photoCertifApi": {
           "id": "1",
@@ -264,7 +264,7 @@
       "name": "Results Summary",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [1360, 200]
+      "position": [1580, 200]
     },
     {
       "parameters": {
@@ -297,7 +297,11 @@
           "node": "1. Get Pricing",
           "type": "main",
           "index": 0
-        },
+        }
+      ]]
+    },
+    "1. Get Pricing": {
+      "main": [[
         {
           "node": "2. Upload Image",
           "type": "main",
