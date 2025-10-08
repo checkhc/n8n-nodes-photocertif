@@ -1,0 +1,196 @@
+{
+  "name": "PhotoCertif B2B - Complete Automation (SOL only)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 400]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "doc1",
+              "name": "fileUrl",
+              "value": "https://drive.google.com/uc?id=YOUR_FILE_ID&export=download",
+              "type": "string"
+            },
+            {
+              "id": "doc2",
+              "name": "title",
+              "value": "Automated Contract 2025",
+              "type": "string"
+            },
+            {
+              "id": "doc3",
+              "name": "description",
+              "value": "B2B automated certification",
+              "type": "string"
+            },
+            {
+              "id": "cert1",
+              "name": "cert_name",
+              "value": "AutoContract2025",
+              "type": "string"
+            },
+            {
+              "id": "cert2",
+              "name": "cert_symbol",
+              "value": "AUTO",
+              "type": "string"
+            },
+            {
+              "id": "cert3",
+              "name": "cert_description",
+              "value": "Automated B2B certification",
+              "type": "string"
+            },
+            {
+              "id": "cert4",
+              "name": "cert_owner",
+              "value": "B2B Client Inc",
+              "type": "string"
+            },
+            {
+              "id": "social1",
+              "name": "external_url",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "test-data",
+      "name": "Input Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [460, 400]
+    },
+    {
+      "parameters": {
+        "resourceType": "docs",
+        "operation": "getPricing"
+      },
+      "id": "get-pricing",
+      "name": "1. Get Pricing",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [680, 400],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "docs",
+        "operation": "upload",
+        "inputType": "url",
+        "fileUrl": "={{ $json.fileUrl }}",
+        "title": "={{ $json.title }}",
+        "description": "={{ $json.description }}"
+      },
+      "id": "upload",
+      "name": "2. Upload Document",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [900, 400],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ==================================================================\n// STEP 3: AUTOMATIC SWAP SOL → CHECKHC (if needed) + PAYMENT\n// ==================================================================\n// This step replicates the web flow: check balance, swap if needed, then pay\n\nconst { Connection, Keypair, PublicKey, VersionedTransaction } = require('@solana/web3.js');\nconst { getAssociatedTokenAddress, createTransferInstruction, getAccount } = require('@solana/spl-token');\nconst bs58 = require('bs58');\nconst fetch = require('node-fetch');\n\n// Get data from previous nodes\nconst pricingData = $('1. Get Pricing').first().json;\nconst uploadData = $('2. Upload Document').first().json;\nconst inputData = $('Input Data').first().json;\n\n// Configuration\nconst RPC_URL = 'https://api.mainnet-beta.solana.com';\nconst JUPITER_API = 'https://quote-api.jup.ag/v6';\nconst SOL_MINT = 'So11111111111111111111111111111111111111112';\nconst CHECKHC_MINT = pricingData.checkhc_mint;\nconst PAYMENT_WALLET = new PublicKey(pricingData.payment_wallet);\nconst AMOUNT_CHECKHC_NEEDED = pricingData.price_checkhc;\nconst SLIPPAGE_BPS = 100; // 1%\n\n// Get wallet credentials\nconst credentials = await this.getCredentials('solanaWallet');\nconst privateKeyBase58 = credentials.privateKey;\nconst payerKeypair = Keypair.fromSecretKey(bs58.decode(privateKeyBase58));\n\nconsole.log('\\n🚀 AUTOMATED SWAP + PAYMENT WORKFLOW');\nconsole.log('Payer wallet:', payerKeypair.publicKey.toString());\nconsole.log('Amount needed:', AMOUNT_CHECKHC_NEEDED, 'CHECKHC');\n\n// Connect to Solana\nconst connection = new Connection(RPC_URL, 'confirmed');\n\n// ============================================\n// PHASE 1: CHECK CHECKHC BALANCE\n// ============================================\nconst checkhcMint = new PublicKey(CHECKHC_MINT);\nconst checkhcTokenAccount = await getAssociatedTokenAddress(\n  checkhcMint,\n  payerKeypair.publicKey\n);\n\nlet currentCHECKHCBalance = 0;\ntry {\n  const accountInfo = await getAccount(connection, checkhcTokenAccount);\n  currentCHECKHCBalance = Number(accountInfo.amount) / 1000000; // 6 decimals\n  console.log('\\n💰 Current CHECKHC balance:', currentCHECKHCBalance);\n} catch (error) {\n  console.log('\\n⚠️ No CHECKHC token account yet (will be created during swap)');\n}\n\nconst checkhcDeficit = Math.max(0, AMOUNT_CHECKHC_NEEDED - currentCHECKHCBalance);\n\n// ============================================\n// PHASE 2: SWAP SOL → CHECKHC (if needed)\n// ============================================\nlet swapSignature = null;\nlet solSpent = 0;\nlet checkhcReceived = 0;\n\nif (checkhcDeficit > 0) {\n  console.log('\\n🔄 Need to swap', checkhcDeficit, 'more CHECKHC');\n  \n  const outputAmountRaw = Math.ceil(checkhcDeficit * 1000000);\n  \n  // Get Jupiter quote\n  const quoteUrl = `${JUPITER_API}/quote?inputMint=${SOL_MINT}&outputMint=${CHECKHC_MINT}&amount=${outputAmountRaw}&slippageBps=${SLIPPAGE_BPS}&swapMode=ExactOut`;\n  \n  const quoteResponse = await fetch(quoteUrl);\n  if (!quoteResponse.ok) {\n    throw new Error(`Jupiter quote failed: ${quoteResponse.statusText}`);\n  }\n  \n  const quoteData = await quoteResponse.json();\n  const solNeeded = Number(quoteData.inAmount) / 1000000000; // 9 decimals\n  \n  console.log('📊 Jupiter Quote:');\n  console.log('  - SOL needed:', solNeeded);\n  console.log('  - CHECKHC to receive:', Number(quoteData.outAmount) / 1000000);\n  console.log('  - Price impact:', quoteData.priceImpactPct, '%');\n  \n  // Check SOL balance\n  const solBalance = await connection.getBalance(payerKeypair.publicKey);\n  const solBalanceFormatted = solBalance / 1000000000;\n  \n  if (solBalanceFormatted < solNeeded + 0.01) {\n    throw new Error(`Insufficient SOL. Need ${solNeeded + 0.01} SOL, have ${solBalanceFormatted} SOL`);\n  }\n  \n  // Get swap transaction\n  const swapResponse = await fetch(`${JUPITER_API}/swap`, {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify({\n      quoteResponse: quoteData,\n      userPublicKey: payerKeypair.publicKey.toString(),\n      wrapAndUnwrapSol: true,\n      dynamicComputeUnitLimit: true,\n      prioritizationFeeLamports: 'auto'\n    })\n  });\n  \n  if (!swapResponse.ok) {\n    throw new Error(`Swap transaction failed: ${swapResponse.statusText}`);\n  }\n  \n  const swapData = await swapResponse.json();\n  const swapTransactionBuf = Buffer.from(swapData.swapTransaction, 'base64');\n  let transaction = VersionedTransaction.deserialize(swapTransactionBuf);\n  \n  transaction.sign([payerKeypair]);\n  \n  console.log('📤 Sending swap transaction...');\n  swapSignature = await connection.sendRawTransaction(transaction.serialize(), {\n    skipPreflight: false,\n    maxRetries: 3\n  });\n  \n  console.log('Swap TX:', swapSignature);\n  \n  // Wait for confirmation\n  const latestBlockhash = await connection.getLatestBlockhash('confirmed');\n  const confirmation = await connection.confirmTransaction({\n    signature: swapSignature,\n    blockhash: latestBlockhash.blockhash,\n    lastValidBlockHeight: latestBlockhash.lastValidBlockHeight\n  }, 'confirmed');\n  \n  if (confirmation.value.err) {\n    throw new Error(`Swap failed: ${JSON.stringify(confirmation.value.err)}`);\n  }\n  \n  console.log('✅ Swap successful!');\n  \n  // Verify new balance\n  const newAccountInfo = await getAccount(connection, checkhcTokenAccount);\n  const newBalance = Number(newAccountInfo.amount) / 1000000;\n  \n  solSpent = solNeeded;\n  checkhcReceived = newBalance - currentCHECKHCBalance;\n  currentCHECKHCBalance = newBalance;\n  \n  console.log('New CHECKHC balance:', currentCHECKHCBalance);\n} else {\n  console.log('\\n✅ Sufficient CHECKHC balance - no swap needed');\n}\n\n// ============================================\n// PHASE 3: PAY CERTIFICATION\n// ============================================\nconsole.log('\\n💳 Paying certification...');\n\nconst paymentTokenAccount = await getAssociatedTokenAddress(\n  checkhcMint,\n  PAYMENT_WALLET\n);\n\nconst amountRaw = Math.floor(AMOUNT_CHECKHC_NEEDED * 1000000);\n\nconst transferIx = createTransferInstruction(\n  checkhcTokenAccount,\n  paymentTokenAccount,\n  payerKeypair.publicKey,\n  amountRaw\n);\n\nconst { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');\n\nconst { Transaction } = require('@solana/web3.js');\nconst paymentTx = new Transaction();\npaymentTx.recentBlockhash = blockhash;\npaymentTx.feePayer = payerKeypair.publicKey;\npaymentTx.add(transferIx);\npaymentTx.sign(payerKeypair);\n\nconst paymentSignature = await connection.sendRawTransaction(\n  paymentTx.serialize(),\n  { skipPreflight: false, preflightCommitment: 'confirmed' }\n);\n\nconsole.log('Payment TX:', paymentSignature);\n\nconst paymentConfirmation = await connection.confirmTransaction({\n  signature: paymentSignature,\n  blockhash,\n  lastValidBlockHeight\n}, 'confirmed');\n\nif (paymentConfirmation.value.err) {\n  throw new Error(`Payment failed: ${JSON.stringify(paymentConfirmation.value.err)}`);\n}\n\nconsole.log('✅ Payment confirmed!\\n');\n\n// Return complete transaction data\nreturn {\n  // Swap data\n  swap_executed: checkhcDeficit > 0,\n  swap_signature: swapSignature,\n  sol_spent: solSpent,\n  checkhc_received: checkhcReceived,\n  checkhc_balance_before: currentCHECKHCBalance - checkhcReceived,\n  checkhc_balance_after: currentCHECKHCBalance,\n  \n  // Payment data\n  payment_signature: paymentSignature,\n  payment_amount: AMOUNT_CHECKHC_NEEDED,\n  payment_wallet: PAYMENT_WALLET.toString(),\n  payer_wallet: payerKeypair.publicKey.toString(),\n  \n  // Links\n  swap_url: swapSignature ? `https://solscan.io/tx/${swapSignature}` : null,\n  payment_url: `https://solscan.io/tx/${paymentSignature}`,\n  \n  // Storage data for next step\n  storage_id: uploadData.storage_id,\n  confirmed: true\n};"
+      },
+      "id": "swap-and-pay",
+      "name": "3. Auto-Swap + Pay",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 400]
+    },
+    {
+      "parameters": {
+        "content": "=## 🎯 COMPLETE B2B WORKFLOW\n\n**Start with SOL only** - Everything automated!\n\n---\n\n## 💰 Pricing\n**Price:** {{ $('1. Get Pricing').item.json.price_checkhc }} CHECKHC (~${{ $('1. Get Pricing').item.json.price_usd }})\n**Payment Wallet:** {{ $('1. Get Pricing').item.json.payment_wallet }}\n\n---\n\n## 📄 Upload\n**Storage ID:** {{ $('2. Upload Document').item.json.storage_id }}\n**Hash:** {{ $('2. Upload Document').item.json.hash }}\n\n---\n\n## 🔄 Swap + Payment\n{{ $('3. Auto-Swap + Pay').item.json.swap_executed ? '**Swap Executed:** ✅' : '**Swap Executed:** ❌ (sufficient balance)' }}\n{{ $('3. Auto-Swap + Pay').item.json.swap_signature ? '**Swap TX:** ' + $('3. Auto-Swap + Pay').item.json.swap_signature : '' }}\n{{ $('3. Auto-Swap + Pay').item.json.sol_spent > 0 ? '**SOL Spent:** ' + $('3. Auto-Swap + Pay').item.json.sol_spent : '' }}\n{{ $('3. Auto-Swap + Pay').item.json.checkhc_received > 0 ? '**CHECKHC Received:** ' + $('3. Auto-Swap + Pay').item.json.checkhc_received : '' }}\n\n**Payment TX:** {{ $('3. Auto-Swap + Pay').item.json.payment_signature }}\n**Amount Paid:** {{ $('3. Auto-Swap + Pay').item.json.payment_amount }} CHECKHC\n\n{{ $('3. Auto-Swap + Pay').item.json.swap_url ? '**Swap Solscan:** ' + $('3. Auto-Swap + Pay').item.json.swap_url : '' }}\n**Payment Solscan:** {{ $('3. Auto-Swap + Pay').item.json.payment_url }}\n\n---\n\n## ⏭️ Next Steps\n\nPayment verified! Now you need to:\n1. Call PhotoCertif server to trigger NFT minting\n2. Or use the web interface with this storage_id\n\n**Storage ID:** {{ $('3. Auto-Swap + Pay').item.json.storage_id }}\n\n---\n\n## ✅ STATUS\n\n**Swap:** {{ $('3. Auto-Swap + Pay').item.json.swap_executed ? '✅ Completed' : '⏭️ Skipped (sufficient balance)' }}\n**Payment:** ✅ Confirmed\n**Total Time:** ~30-60 seconds\n**User Started With:** SOL only 🚀",
+        "height": 800,
+        "width": 600,
+        "color": 4
+      },
+      "id": "results",
+      "name": "Results Summary",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1360, 200]
+    },
+    {
+      "parameters": {
+        "content": "=## ⚙️ COMPLETE WORKFLOW - SOL ONLY\n\n### ✨ Key Feature:\n**User can start with SOL only!**\n\nThe workflow automatically:\n1. ✅ Checks CHECKHC balance\n2. ✅ Swaps SOL → CHECKHC (if needed via Jupiter)\n3. ✅ Pays certification\n\n### 📋 Requirements:\n1. **PhotoCertif API Credentials**\n   - URL: https://localhost or https://app2.photocertif.com\n   - API Key: pk_live_xxxxx\n\n2. **Solana Wallet Credentials**\n   - Private Key (base58)\n   - Must have **SOL only** (no CHECKHC needed!)\n   - Minimum: ~1 SOL for docs, ~3 SOL for art\n\n### 🔄 How It Works:\n\n**If you have 0 CHECKHC:**\n- Auto-swap SOL → CHECKHC via Jupiter\n- Then pay with swapped CHECKHC\n\n**If you have some CHECKHC:**\n- Swap only the missing amount\n- Optimize your costs\n\n**If you have enough CHECKHC:**\n- Skip swap entirely\n- Pay directly\n\n### ⚠️ Current Limitation:\n\nThis workflow stops after payment verification.\n\nFor complete automation (including NFT minting), you need:\n- Server-side Irys upload (TODO)\n- Server-side NFT minting (TODO)\n\nOR use the web interface with the storage_id.\n\n### 💰 Costs:\n- Docs: ~175 CHECKHC (~$1)\n- Art: ~525 CHECKHC (~$3)\n- SOL for swap fees: ~0.01-0.02 SOL",
+        "height": 700,
+        "width": 450,
+        "color": 5
+      },
+      "id": "info",
+      "name": "Workflow Info",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [240, 620]
+    }
+  ],
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [[
+        {
+          "node": "Input Data",
+          "type": "main",
+          "index": 0
+        }
+      ]]
+    },
+    "Input Data": {
+      "main": [[
+        {
+          "node": "1. Get Pricing",
+          "type": "main",
+          "index": 0
+        }
+      ]]
+    },
+    "1. Get Pricing": {
+      "main": [[
+        {
+          "node": "2. Upload Document",
+          "type": "main",
+          "index": 0
+        }
+      ]]
+    },
+    "2. Upload Document": {
+      "main": [[
+        {
+          "node": "3. Auto-Swap + Pay",
+          "type": "main",
+          "index": 0
+        }
+      ]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "id": "photocertif-b2b-complete-sol-only",
+  "meta": {
+    "instanceId": "photocertif-b2b-complete-sol-only"
+  },
+  "tags": []
+}
