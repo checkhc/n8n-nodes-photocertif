@@ -60,6 +60,12 @@
               "name": "collection_mint",
               "value": "BMCVo8ehcpR2E92d2RUqyybQ7fMeDUWpMxNbaAsQqV8i",
               "type": "string"
+            },
+            {
+              "id": "extension",
+              "name": "file_extension",
+              "value": "pdf",
+              "type": "string"
             }
           ]
         }
@@ -94,7 +100,8 @@
         "inputType": "url",
         "fileUrl": "={{ $('Input Data').item.json.fileUrl }}",
         "title": "={{ $('Input Data').item.json.title }}",
-        "description": "={{ $('Input Data').item.json.description }}"
+        "description": "={{ $('Input Data').item.json.description }}",
+        "fileExtension": "={{ $('Input Data').item.json.file_extension }}"
       },
       "id": "upload",
       "name": "2. Upload Document",

@@ -199,6 +199,20 @@ export class PhotoCertif implements INodeType {
 				placeholder: 'Optional description',
 				description: 'Description of the content (optional)',
 			},
+			{
+				displayName: 'File Extension',
+				name: 'fileExtension',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['upload'],
+						inputType: ['url'],
+					},
+				},
+				default: 'pdf',
+				placeholder: 'pdf, zip, jpg, png, docx, etc.',
+				description: 'File extension (required for URL uploads as they often lack extension)',
+			},
 
 			// ============================================
 			// CERTIFY PARAMETERS (15 fields total!)
@@ -468,6 +482,7 @@ export class PhotoCertif implements INodeType {
 					const title = this.getNodeParameter('title', i) as string;
 					const description = this.getNodeParameter('description', i, '') as string;
 					const inputType = this.getNodeParameter('inputType', i, 'base64') as string;
+					const fileExtension = this.getNodeParameter('fileExtension', i, '') as string;
 
 					let fileData: string;
 
@@ -497,13 +512,20 @@ export class PhotoCertif implements INodeType {
 						fileData = this.getNodeParameter('fileData', i) as string;
 					}
 
+					const requestBody: any = {
+						file: fileData,
+						title,
+						description,
+					};
+
+					// Add file_extension if provided (important for URL uploads)
+					if (fileExtension) {
+						requestBody.file_extension = fileExtension;
+					}
+
 					const response = await axios.post(
 						`${baseUrl}${endpoint}/upload/iv_route`,
-						{
-							file: fileData,
-							title,
-							description,
-						},
+						requestBody,
 						{
 							headers: {
 								'Authorization': `Bearer ${apiKey}`,
