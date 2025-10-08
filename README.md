@@ -542,4 +542,10 @@ Built by [CheckHC](https://github.com/checkhc) for the PhotoCertif ecosystem.
 - Twitter/X, Discord, Instagram, Telegram, Medium, Wiki, YouTube
 - Full NFT metadata support
 
-See **[URL_SUPPORT_GUIDE.md](./URL_SUPPORT_GUIDE.md)** for complete documentation.
+### **Batch Certification Ready** ⭐
+- Professional XLSX template with examples (`photocertif-batch-example.xlsx`)
+- 3 complete examples + 6 empty rows ready to fill
+- Instructions tab included in Excel file
+- Perfect for Google Sheets integration
+
+See **[URL_SUPPORT_GUIDE.md](./URL_SUPPORT_GUIDE.md)** and **[BATCH_CERTIFICATION_GUIDE.md](./BATCH_CERTIFICATION_GUIDE.md)** for complete documentation.

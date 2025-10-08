@@ -1,10 +1,17 @@
 # 📊 Guide de Certification par Lot (Batch)
 
-## 📥 Fichier d'Exemple Fourni
+## 📥 Fichiers d'Exemple Fournis
 
-**Fichier** : `photocertif-batch-example.csv`
+**Fichiers** :
+- **`photocertif-batch-example.xlsx`** ⭐ (Recommandé - Excel/Google Sheets)
+- `photocertif-batch-example.csv` (Alternative compatible)
 
-Ce fichier contient **3 exemples complets** avec toutes les colonnes nécessaires pour la certification automatisée.
+Le fichier XLSX contient :
+- **3 exemples complets** avec toutes les colonnes
+- **6 lignes vides** prêtes à remplir
+- **Formatage professionnel** (en-têtes colorés, bordures)
+- **Onglet Instructions** avec guide complet
+- **Colonnes ajustées** automatiquement
 
 ---
 
@@ -44,8 +51,19 @@ Ce fichier contient **3 exemples complets** avec toutes les colonnes nécessaire
 
 ## 🚀 Utilisation avec n8n
 
-### **1. Ouvrir le fichier CSV dans Google Sheets**
+### **1. Ouvrir le fichier dans Google Sheets**
 
+**Option A - XLSX (Recommandé)** :
+```
+1. Ouvrir photocertif-batch-example.xlsx dans Excel
+2. Modifier les exemples ou remplir les lignes vides
+3. Fichier → Sauvegarder
+4. Uploader sur Google Drive
+5. Ouvrir avec Google Sheets
+6. Partager → Obtenir le lien (Anyone with the link can view)
+```
+
+**Option B - CSV** :
 ```
 1. Aller sur https://sheets.google.com
 2. Fichier → Importer → Uploader photocertif-batch-example.csv
@@ -173,20 +191,32 @@ https://cdn.com/photo.jpg,Sunset,Photo2025,PHOTO,https://portfolio.com,https://i
 
 ---
 
-## 📊 Structure du Fichier CSV
+## 📊 Structure du Fichier
 
+### **XLSX (Fichier Excel)**
 ```
-[EN-TÊTE]
+Sheet 1: Certification Data
+┌─────────────────────────────────────────────────────────────────┐
+│ fileUrl │ title │ description │ cert_name │ cert_symbol │ ... │
+├─────────────────────────────────────────────────────────────────┤
+│ https://drive... │ My Art │ ... │ Art2025 │ MYART │ ... │ ← Exemple 1
+│ https://dropbox... │ Doc │ ... │ Doc2025 │ DOC │ ... │ ← Exemple 2
+│ https://cdn... │ Photo │ ... │ Photo2025 │ PHOTO │ ... │ ← Exemple 3
+│ (vide) │ │ │ │ │ │ ← À remplir
+│ (vide) │ │ │ │ │ │ ← À remplir
+└─────────────────────────────────────────────────────────────────┘
+
+Sheet 2: Instructions
+- Guide complet des colonnes
+- Exemples d'URLs (Google Drive, Dropbox)
+- Tips et bonnes pratiques
+```
+
+### **CSV (Alternative)**
+```
 fileUrl,title,description,cert_name,cert_symbol,...
-
-[LIGNE 1 - Exemple complet]
-https://drive.google.com/...,My Art,Description,Art2025,ART,https://site.com,...
-
-[LIGNE 2 - Exemple minimal]
-https://dropbox.com/...,Document,Description,Doc2025,DOC,,,,,,,,,
-
-[LIGNE 3 - Exemple mixte]
-https://cdn.com/...,Photo,Description,Photo2025,PHOTO,https://site.com,,,,https://t.me/channel,,,
+https://drive.google.com/...,My Art,Description,Art2025,ART,...
+https://dropbox.com/...,Document,Description,Doc2025,DOC,...
 ```
 
 ---
@@ -195,11 +225,12 @@ https://cdn.com/...,Photo,Description,Photo2025,PHOTO,https://site.com,,,,https:
 
 | Aspect | Détails |
 |--------|---------|
-| **Fichier fourni** | `photocertif-batch-example.csv` |
+| **Fichiers fournis** | `photocertif-batch-example.xlsx` (recommandé) + CSV |
 | **Colonnes totales** | 15 (7 obligatoires + 8 optionnelles) |
-| **Exemples inclus** | 3 lignes complètes |
+| **Exemples inclus** | 3 lignes complètes + 6 lignes vides |
 | **Compatible** | Excel, Google Sheets, n8n |
-| **Format** | CSV UTF-8 |
+| **Format** | XLSX (Excel 2007+) ou CSV UTF-8 |
+| **Onglets XLSX** | Data + Instructions intégrées |
 
 ---
 
