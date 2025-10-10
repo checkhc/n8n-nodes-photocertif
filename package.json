@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-photocertif",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "n8n node for PhotoCertif - Document certification on Solana blockchain",
   "keywords": [
     "n8n",
@@ -37,8 +37,7 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/PhotoCertifApi.credentials.js",
-      "dist/credentials/SolanaWallet.credentials.js"
+      "dist/credentials/PhotoCertifApi.credentials.js"
     ],
     "nodes": [
       "dist/nodes/PhotoCertif/PhotoCertif.node.js"
@@ -53,12 +52,11 @@
     "prettier": "^3.0.0",
     "typescript": "^5.0.0"
   },
+  "peerDependencies": {
+    "n8n-nodes-solana-swap": "^1.5.0"
+  },
   "dependencies": {
-    "@solana/spl-token": "^0.3.9",
-    "@solana/web3.js": "^1.87.6",
     "axios": "^1.6.0",
-    "bs58": "^5.0.0",
-    "form-data": "^4.0.0",
-    "n8n-nodes-photocertif": "file:n8n-nodes-photocertif-1.0.1.tgz"
+    "form-data": "^4.0.0"
   }
 }

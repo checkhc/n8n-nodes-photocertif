@@ -64,7 +64,6 @@ export class PhotoCertif implements INodeType {
 		subtitle: '={{$parameter["operation"]}} - {{$parameter["resourceType"]}}',
 		description: 'Interact with PhotoCertif API for document and art certification on Solana blockchain',
 		defaults: {
-			name: 'PhotoCertif',
 		},
 		inputs: ['main'],
 		outputs: ['main'],
@@ -72,13 +71,6 @@ export class PhotoCertif implements INodeType {
 			{
 				name: 'photoCertifApi',
 				required: true,
-				displayOptions: {
-					show: {},
-				},
-			},
-			{
-				name: 'solanaWallet',
-				required: false,
 				displayOptions: {
 					show: {},
 				},

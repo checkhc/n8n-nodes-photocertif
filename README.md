@@ -45,6 +45,24 @@ Custom n8n node for **PhotoCertif** - Document and Art certification on Solana b
 
 ## 📦 Installation
 
+### ⚠️ Required Dependencies
+
+**IMPORTANT:** This node requires `n8n-nodes-solana-swap` v1.5.0+ for Solana blockchain operations (CHECKHC token transfers, balance checks, swaps).
+
+### Via npm (Recommended)
+
+```bash
+# Install both packages
+npm install n8n-nodes-solana-swap n8n-nodes-photocertif
+
+# Or globally for n8n
+cd ~/.n8n
+npm install n8n-nodes-solana-swap n8n-nodes-photocertif
+
+# Restart n8n
+n8n start
+```
+
 ### Via n8n Community Nodes (When Published)
 
 1. Go to **Settings** → **Community Nodes**
@@ -81,27 +99,24 @@ Restart n8n after installation.
 
 ---
 
-### Credential 2: Solana Credentials ⭐ NEW (Optional - For Automated Workflows)
+### Credential 2: Solana API ⭐ (Required for Automated Payments)
 
-**Required for**: Automated B2B workflows with automatic payment
+**Provided by**: `n8n-nodes-solana-swap` package
 
-**Two options available** (both work):
+**Required for**: Automated CHECKHC token transfers and blockchain operations
 
-#### **Option A: Solana Wallet** (PhotoCertif dedicated)
 1. Open n8n → **Credentials** → **New Credential**
-2. Search for "**Solana Wallet**"
+2. Search for "**Solana API**"
 3. Fill in:
+   - **Network**: `Mainnet Beta` (or Devnet for testing)
+   - **RPC Endpoint Type**: `Public RPC` or `Custom RPC` (Helius/QuickNode for better performance)
    - **Private Key**: Your Solana wallet private key (base58 format)
-   - **Network**: `Mainnet` (or Devnet for testing)
-   - **RPC URL**: `https://api.mainnet-beta.solana.com` (or use private RPC)
+   - **Public Key**: Your Solana wallet address
 
-#### **Option B: Solana API** (Reuse from n8n-nodes-solana-swap)
-If you already have Solana credentials from `n8n-nodes-solana-swap`:
-1. Open n8n → **Credentials** → Select existing "**Solana API**"
-2. PhotoCertif node will automatically detect and use:
-   - **Private Key** → For signing transactions
-   - **Network** + **RPC URL** → For blockchain connection
-   - **No additional configuration needed** ✅
+**✅ Benefits:**
+- **Reusable** across multiple n8n nodes (PhotoCertif, SolanaSwap, etc.)
+- **Flexible** RPC configuration (public or private endpoints)
+- **Complete** Solana API access for advanced workflows
 
 **⚠️ Security Recommendations:**
 - Use a **dedicated wallet** for n8n (not your main wallet)
@@ -509,24 +524,79 @@ Built by [CheckHC](https://github.com/checkhc) for the PhotoCertif ecosystem.
 
 ---
 
-## 🎯 Example Workflows Included
+## 🎯 Complete Workflow Example
 
-### **Automated B2B Workflows**:
-- `workflow-docs-automated-b2b.json` - Fully automated document certification
-- `workflow-image2-automated-b2b.json` - Fully automated art certification
+### **Automated Document Certification with CHECKHC Payment**
 
-**Import**: n8n → Workflows → Import from File
+```yaml
+Workflow: PhotoCertif + SolanaSwap Integration
+==============================================
 
-**Features**:
-- ✅ 100% automated payment with Solana Wallet credential
-- ✅ Server-side NFT minting
-- ✅ Zero human intervention required
-- ✅ Perfect for high-volume B2B integrations
+Trigger: Webhook or Schedule
+    ↓
+[1] PhotoCertif: Upload
+    - Operation: upload
+    - Input Type: url
+    - File URL: {{ $json.fileUrl }}
+    - Title: {{ $json.title }}
+    Output: { storageId, price_checkhc }
+    ↓
+[2] SolanaNode: Get Token Balance
+    - Operation: getTokenBalance  
+    - Token Mint: {{ $node["PhotoCertif"].json.checkhc_mint }}
+    - Wallet: (from Solana API credential)
+    Output: { balance }
+    ↓
+[3] IF Node: balance >= price_checkhc?
+    ↓ YES                          ↓ NO
+    [Skip to Step 5]               [4] SolanaNode: Execute Swap
+                                      - Operation: executeSwapAdvanced
+                                      - From: SOL
+                                      - To: CHECKHC
+                                      - Amount: {{ price_checkhc }}
+                                      Output: { swapTx }
+    ↓
+[5] SolanaNode: Send Token
+    - Operation: sendToken
+    - Token Mint: {{ $node["PhotoCertif"].json.checkhc_mint }}
+    - Recipient: {{ $node["PhotoCertif"].json.payment_wallet }}
+    - Amount: {{ $node["PhotoCertif"].json.price_checkhc }}
+    Output: { signature }
+    ↓
+[6] Wait 5 seconds (for blockchain confirmation)
+    ↓
+[7] PhotoCertif: Certify
+    - Operation: certify
+    - Storage ID: {{ $node["PhotoCertif"].json.storageId }}
+    - Name: {{ $json.name }}
+    - Symbol: {{ $json.symbol }}
+    - Description: {{ $json.description }}
+    Output: { certification_id }
+    ↓
+[8] PhotoCertif: Wait For Certification
+    - Operation: waitForCertification
+    - Storage ID: {{ $node["PhotoCertif Certify"].json.storageId }}
+    - Polling Interval: 300 (5 minutes)
+    - Max Wait: 3600 (1 hour)
+    Output: { status: "certified", nft_mint, metadata }
+    ↓
+[9] Success Notification
+    - Email/Slack/Discord notification
+    - Data: NFT Mint, Certification URL, etc.
+```
+
+### **Key Benefits of This Architecture:**
+
+✅ **Composable**: Mix PhotoCertif + SolanaSwap + any n8n node
+✅ **Flexible**: User can customize payment logic, add conditions, notifications
+✅ **Reusable**: Solana API credential used across multiple operations
+✅ **Maintainable**: Updates to Solana logic happen in solana-swap package
+✅ **Scalable**: Easy to add batch processing, error handling, retries
 
 ---
 
-**Version**: 2.1.0  
-**Last Updated**: 2025-10-07
+**Version**: 1.1.0  
+**Last Updated**: 2025-10-10
 
 ---
 
