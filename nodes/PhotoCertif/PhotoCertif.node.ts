@@ -56,14 +56,15 @@ function validateUrl(urlString: string): void {
 
 export class PhotoCertif implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'PhotoCertif',
+		displayName: 'PhotoCertif by CheckHC',
 		name: 'photoCertif',
 		icon: 'file:photocertif.png',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}} - {{$parameter["resourceType"]}}',
-		description: 'Interact with PhotoCertif API for document and art certification on Solana blockchain',
+		description: 'PhotoCertif by CheckHC - Document and art certification on Solana blockchain with AI authentication. Learn more: https://www.checkhc.net',
 		defaults: {
+			name: 'PhotoCertif by CheckHC',
 		},
 		inputs: ['main'],
 		outputs: ['main'],

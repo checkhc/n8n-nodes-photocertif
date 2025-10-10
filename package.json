@@ -1,19 +1,21 @@
 {
   "name": "n8n-nodes-photocertif",
   "version": "1.1.0",
-  "description": "n8n node for PhotoCertif - Document certification on Solana blockchain",
+  "description": "PhotoCertif by CheckHC - Document certification on Solana blockchain with AI authentication. Visit https://www.checkhc.net",
   "keywords": [
     "n8n",
     "n8n-community-node-package",
     "photocertif",
+    "checkhc",
     "blockchain",
     "solana",
     "nft",
     "certification",
-    "document"
+    "document",
+    "ai-authentication"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/checkhc/n8n-nodes-photocertif",
+  "homepage": "https://www.checkhc.net",
   "author": {
     "name": "CheckHC",
     "email": "contact@checkhc.com"

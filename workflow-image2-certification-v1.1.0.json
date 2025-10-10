@@ -1,13 +1,25 @@
 {
-  "name": "PhotoCertif Image2 - Art Certification Workflow v1.1.0",
+  "name": "PhotoCertif by CheckHC - Art Certification Workflow v1.1.0",
   "nodes": [
+    {
+      "parameters": {
+        "content": "## 🎨 PhotoCertif by CheckHC - Art Certification\n\n🌐 **Learn more:** https://www.checkhc.net\n📧 **Contact:** contact@checkhc.com\n\n### 🎯 What this workflow does:\n1. **Get Pricing** - Fetch current certification cost in CHECKHC\n2. **Upload Image** - Upload JPG/PNG to PhotoCertif\n3. **Check Balance** - Verify CHECKHC balance in your wallet\n4. **Swap (if needed)** - Auto-swap SOL to CHECKHC if balance insufficient\n5. **Transfer Payment** - Send CHECKHC to PhotoCertif\n6. **Wait Confirmation** - Wait for blockchain confirmation (10s)\n7. **Certify** - Launch **AI Analysis (4 levels)** + Irys upload + NFT\n8. **Poll Status** - Wait until certification complete (AI + Irys)\n9. **Success** - Return NFT mint + AI authenticity score\n\n### 🤖 AI Authentication Levels:\n- **Level 1** (0-25%): Certified Original Human Art\n- **Level 2** (26-50%): Likely Human with AI Elements\n- **Level 3** (51-75%): Likely AI with Human Modifications\n- **Level 4** (76-100%): AI-Generated Art\n\n### 📋 Prerequisites:\n✅ PhotoCertif API credential configured\n✅ Solana API credential with private key\n✅ CHECKHC tokens or SOL for swap\n\n### 🔧 Configuration:\n- Edit **Input Data** node with your image URL\n- Assign credentials to all nodes\n- Click **Execute Workflow** to test\n\n### 📚 Documentation:\nSee WORKFLOWS_GUIDE.md in the package\n\n---\n**Powered by CheckHC** | https://www.checkhc.net",
+        "height": 560,
+        "width": 420
+      },
+      "id": "sticky-doc",
+      "name": "Documentation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [240, 140]
+    },
     {
       "parameters": {},
       "id": "manual-trigger",
       "name": "Manual Trigger",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [240, 500]
+      "position": [240, 720]
     },
     {
       "parameters": {
@@ -68,7 +80,7 @@
       "name": "Input Data",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [460, 500]
+      "position": [460, 720]
     },
     {
       "parameters": {
@@ -79,7 +91,7 @@
       "name": "1. Get Pricing",
       "type": "n8n-nodes-photocertif.photoCertif",
       "typeVersion": 1,
-      "position": [680, 500],
+      "position": [680, 720],
       "credentials": {
         "photoCertifApi": {
           "id": "photocertif_api",
@@ -100,7 +112,7 @@
       "name": "2. Upload Image",
       "type": "n8n-nodes-photocertif.photoCertif",
       "typeVersion": 1,
-      "position": [900, 500],
+      "position": [900, 720],
       "credentials": {
         "photoCertifApi": {
           "id": "photocertif_api",
@@ -118,7 +130,7 @@
       "name": "3. Check CHECKHC Balance",
       "type": "n8n-nodes-solana-swap.solanaNode",
       "typeVersion": 1,
-      "position": [1120, 500],
+      "position": [1120, 720],
       "credentials": {
         "solanaApi": {
           "id": "solana_api",
@@ -142,7 +154,7 @@
       "name": "4. Balance Sufficient?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1340, 500]
+      "position": [1340, 720]
     },
     {
       "parameters": {
@@ -156,7 +168,7 @@
       "name": "5a. Swap SOL → CHECKHC",
       "type": "n8n-nodes-solana-swap.solanaNode",
       "typeVersion": 1,
-      "position": [1560, 380],
+      "position": [1560, 600],
       "credentials": {
         "solanaApi": {
           "id": "solana_api",
@@ -175,7 +187,7 @@
       "name": "6. Transfer CHECKHC Payment",
       "type": "n8n-nodes-solana-swap.solanaNode",
       "typeVersion": 1,
-      "position": [1780, 500],
+      "position": [1780, 720],
       "credentials": {
         "solanaApi": {
           "id": "solana_api",
@@ -192,7 +204,7 @@
       "name": "7. Wait Blockchain Confirmation",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [2000, 500],
+      "position": [2000, 720],
       "webhookId": "blockchain-confirmation-wait-img2"
     },
     {
@@ -210,7 +222,7 @@
       "name": "8. Certify Image (AI Analysis)",
       "type": "n8n-nodes-photocertif.photoCertif",
       "typeVersion": 1,
-      "position": [2220, 500],
+      "position": [2220, 720],
       "credentials": {
         "photoCertifApi": {
           "id": "photocertif_api",
@@ -230,7 +242,7 @@
       "name": "9. Wait For Certification (AI + Irys)",
       "type": "n8n-nodes-photocertif.photoCertif",
       "typeVersion": 1,
-      "position": [2440, 500],
+      "position": [2440, 720],
       "credentials": {
         "photoCertifApi": {
           "id": "photocertif_api",
@@ -303,7 +315,7 @@
       "name": "10. Success Output",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [2660, 500]
+      "position": [2660, 720]
     }
   ],
   "connections": {
