@@ -47,7 +47,12 @@ Custom n8n node for **PhotoCertif** - Document and Art certification on Solana b
 
 ### ⚠️ Required Dependencies
 
-**IMPORTANT:** This node requires `n8n-nodes-solana-swap` v1.5.0+ for Solana blockchain operations (CHECKHC token transfers, balance checks, swaps).
+**IMPORTANT:** This node requires `n8n-nodes-solana-swap` v1.6.1+ for Solana blockchain operations (CHECKHC token transfers, balance checks, swaps).
+
+**What's new in v1.6.1:**
+- ✅ SPL token transfers fully implemented with `@solana/spl-token`
+- ✅ Automatic associated token account creation
+- ✅ Compatible with all RPC providers (Helius, QuickNode, Alchemy)
 
 ### Via npm (Recommended)
 
@@ -326,6 +331,33 @@ Download certified content.
   "expires_at": "2025-01-07T20:00:00Z"
 }
 ```
+
+---
+
+## 📂 Available Workflows
+
+### **Docs Certification v2.2.0 (Recommended)**
+**File:** `workflow-docs-certification-v2.2.0.json`  
+**Status:** ✅ Tested & Production-Ready
+
+**Features:**
+- ✅ **Automatic upload** from URL or base64
+- ✅ **Real-time pricing** with affiliate split calculation
+- ✅ **Auto SOL→CHECKHC swap** if balance insufficient
+- ✅ **Automatic CHECKHC transfers** to payment + affiliate wallets
+- ✅ **Server-side NFT minting** and transfer
+- ✅ **Complete B2B automation** - zero human intervention
+
+**Fixed in v2.2.0:**
+- 🐛 Fixed `storageId` path in certify operation (was causing HTTP 500)
+- ✅ All nodes tested and validated end-to-end
+
+**Changelog:** See `WORKFLOW_V2.2.0_CHANGELOG.md`
+
+### **Previous Versions**
+- `workflow-docs-certification-v2.1.0.json` - ⚠️ **Deprecated** (storageId bug)
+- `workflow-docs-certification-v2.0.0.json` - ⚠️ **Deprecated**
+- `workflow-image2-certification-v1.1.0.json` - For art/image certification
 
 ---
 

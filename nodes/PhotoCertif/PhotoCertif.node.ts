@@ -7,12 +7,30 @@ import {
 } from 'n8n-workflow';
 
 import axios from 'axios';
+import * as https from 'https';
 
 // Security and Performance Constants
 const REQUEST_TIMEOUT = 30000;          // 30 seconds for API requests
 const DOWNLOAD_TIMEOUT = 120000;        // 2 minutes for file downloads
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB maximum file size
 const MIN_POLLING_INTERVAL = 10;        // 10 seconds minimum polling interval
+
+/**
+ * Creates axios config with HTTPS agent for self-signed certificates in local development
+ * @param baseUrl - The base URL to connect to
+ * @returns Axios config object with httpsAgent if needed
+ */
+function getAxiosConfig(baseUrl: string): { httpsAgent?: https.Agent } {
+	// Allow self-signed certificates for localhost/127.0.0.1 only (development)
+	if (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')) {
+		return {
+			httpsAgent: new https.Agent({
+				rejectUnauthorized: false
+			})
+		};
+	}
+	return {};
+}
 
 /**
  * Validates URL to prevent SSRF (Server-Side Request Forgery) attacks
@@ -251,6 +269,36 @@ export class PhotoCertif implements INodeType {
 				default: 'pdf',
 				placeholder: 'pdf, zip, jpg, png, docx, etc.',
 				description: 'File extension (required for URL uploads as they often lack extension)',
+			},
+
+			// ============================================
+			// GET PRICING PARAMETERS
+			// ============================================
+			{
+				displayName: 'File Size (Bytes)',
+				name: 'fileSize',
+				type: 'number',
+				displayOptions: {
+					show: {
+						operation: ['getPricing'],
+					},
+				},
+				default: 0,
+				placeholder: '500000',
+				description: 'Processed file size in bytes (optional, for Irys cost calculation)',
+			},
+			{
+				displayName: 'Original File Size (Bytes)',
+				name: 'originalSize',
+				type: 'number',
+				displayOptions: {
+					show: {
+						operation: ['getPricing'],
+					},
+				},
+				default: 0,
+				placeholder: '2000000',
+				description: 'Original file size in bytes (optional, for Irys cost calculation)',
 			},
 
 			// ============================================
@@ -585,6 +633,7 @@ export class PhotoCertif implements INodeType {
 								'Authorization': `Bearer ${apiKey}`,
 								'Content-Type': 'application/json',
 							},
+							...getAxiosConfig(baseUrl),
 						},
 					);
 
@@ -604,6 +653,7 @@ export class PhotoCertif implements INodeType {
 							headers: {
 								'Authorization': `Bearer ${apiKey}`,
 							},
+							...getAxiosConfig(baseUrl),
 						},
 					);
 
@@ -656,6 +706,7 @@ export class PhotoCertif implements INodeType {
 								'Authorization': `Bearer ${apiKey}`,
 								'Content-Type': 'application/json',
 							},
+													...getAxiosConfig(baseUrl),
 						},
 					);
 
@@ -695,6 +746,7 @@ export class PhotoCertif implements INodeType {
 								headers: {
 									'Authorization': `Bearer ${apiKey}`,
 								},
+								...getAxiosConfig(baseUrl),
 							},
 						);
 
@@ -741,6 +793,7 @@ export class PhotoCertif implements INodeType {
 							headers: {
 								'Authorization': `Bearer ${apiKey}`,
 							},
+							...getAxiosConfig(baseUrl),
 						},
 					);
 
@@ -751,13 +804,27 @@ export class PhotoCertif implements INodeType {
 				// GET PRICING OPERATION
 				// ============================================
 				else if (operation === 'getPricing') {
+					// Get optional parameters
+					const fileSize = this.getNodeParameter('fileSize', i, 0) as number;
+					const originalSize = this.getNodeParameter('originalSize', i, 0) as number;
+					
+					// Build query params
+					let queryParams = `type=${resourceType}`;
+					if (fileSize > 0) {
+						queryParams += `&fileSize=${fileSize}`;
+					}
+					if (originalSize > 0) {
+						queryParams += `&originalSize=${originalSize}`;
+					}
+					
 					const response = await axios.get(
-						`${baseUrl}/api/pricing/service?type=${resourceType}`,
+						`${baseUrl}/api/pricing/service?${queryParams}`,
 						{
 							timeout: REQUEST_TIMEOUT,
 							headers: {
 								'Authorization': `Bearer ${apiKey}`,
 							},
+							...getAxiosConfig(baseUrl),
 						},
 					);
 
