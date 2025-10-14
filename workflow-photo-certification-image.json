@@ -1,0 +1,196 @@
+{
+  "name": "PhotoCertif - Photo Certification Flexible (Pinata)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "p1q2r3s4-t5u6-7890-pqrs-tu1234567890",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "resourceType": "image",
+        "operation": "upload",
+        "inputType": "url",
+        "fileUrl": "https://example.com/photo.jpg",
+        "title": "My Photo Title",
+        "description": "Description of the photo for certification"
+      },
+      "id": "q2r3s4t5-u6v7-8901-qrst-uv1234567891",
+      "name": "Upload Photo",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "image",
+        "operation": "certify",
+        "storageId": "={{ $json.storage_id }}",
+        "certificationName": "{{ $json.title }}",
+        "certificationSymbol": "PHOTO",
+        "certificationDescription": "{{ $json.description }}",
+        "ownerName": "Your Name"
+      },
+      "id": "r3s4t5u6-v7w8-9012-rstu-vw1234567892",
+      "name": "Submit Photo Certification",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "image",
+        "operation": "waitForCertification",
+        "storageId": "={{ $json.storage_id }}",
+        "maxWaitTime": 300,
+        "pollingInterval": 15
+      },
+      "id": "s4t5u6v7-w8x9-0123-stuv-wx1234567893",
+      "name": "Wait for Photo Certification",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "image",
+        "operation": "getStatus",
+        "storageId": "={{ $json.storage_id }}"
+      },
+      "id": "t5u6v7w8-x9y0-1234-tuvw-xy1234567894",
+      "name": "Get Photo Status",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [1050, 300],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "image",
+        "operation": "download",
+        "storageId": "={{ $json.storage_id }}"
+      },
+      "id": "u6v7w8x9-y0z1-2345-uvwx-yz1234567895",
+      "name": "Download Certified Photo",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [1250, 300],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Upload Photo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Photo": {
+      "main": [
+        [
+          {
+            "node": "Submit Photo Certification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit Photo Certification": {
+      "main": [
+        [
+          {
+            "node": "Wait for Photo Certification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Photo Certification": {
+      "main": [
+        [
+          {
+            "node": "Get Photo Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Photo Status": {
+      "main": [
+        [
+          {
+            "node": "Download Certified Photo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z",
+      "id": "1",
+      "name": "PhotoCertif"
+    },
+    {
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z",
+      "id": "2",
+      "name": "Photo Certification"
+    },
+    {
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z",
+      "id": "3",
+      "name": "Pinata"
+    }
+  ],
+  "meta": {
+    "instanceId": "your-instance-id"
+  }
+}

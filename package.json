@@ -37,7 +37,8 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/PhotoCertifApi.credentials.js"
+      "dist/credentials/PhotoCertifApi.credentials.js",
+      "dist/credentials/SolanaApi.credentials.js"
     ],
     "nodes": [
       "dist/nodes/PhotoCertif/PhotoCertif.node.js"

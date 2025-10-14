@@ -1,0 +1,203 @@
+{
+  "name": "PhotoCertif - Art Certification (Irys/Arweave)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "resourceType": "image2",
+        "operation": "upload",
+        "inputType": "url",
+        "fileUrl": "https://example.com/artwork.jpg",
+        "title": "My Artwork Title",
+        "description": "Description of the artwork for certification"
+      },
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "Upload Art Image",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "image2",
+        "operation": "certify",
+        "storageId": "={{ $json.storage_id }}",
+        "certificationName": "{{ $json.title }}",
+        "certificationSymbol": "ART",
+        "certificationDescription": "{{ $json.description }}",
+        "ownerName": "Your Name"
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "Submit Art Certification",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "image2",
+        "operation": "waitForCertification",
+        "storageId": "={{ $json.storage_id }}",
+        "maxWaitTime": 300,
+        "pollingInterval": 15
+      },
+      "id": "d4e5f6a7-b8c9-0123-def0-234567890123",
+      "name": "Wait for Art Certification",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "image2",
+        "operation": "b2bCertifyFull",
+        "storageId": "={{ $json.storage_id }}",
+        "fingerprintName": "my_art_fingerprint",
+        "walletPrivateKey": "={{ $env.SOLANA_WALLET_PRIVATE_KEY }}",
+        "recipientWallet": "={{ $env.RECIPIENT_WALLET_ADDRESS }}"
+      },
+      "id": "e5f6a7b8-c9d0-1234-ef01-345678901234",
+      "name": "B2B Complete Art Certification",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [1050, 300],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        },
+        "solanaApi": {
+          "id": "2",
+          "name": "Solana API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resourceType": "image2",
+        "operation": "download",
+        "storageId": "={{ $json.storage_id }}"
+      },
+      "id": "f6a7b8c9-d0e1-2345-f012-456789012345",
+      "name": "Download Certified Art",
+      "type": "n8n-nodes-photocertif.photoCertif",
+      "typeVersion": 1,
+      "position": [1250, 300],
+      "credentials": {
+        "photoCertifApi": {
+          "id": "1",
+          "name": "PhotoCertif API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Upload Art Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Art Image": {
+      "main": [
+        [
+          {
+            "node": "Submit Art Certification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit Art Certification": {
+      "main": [
+        [
+          {
+            "node": "Wait for Art Certification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Art Certification": {
+      "main": [
+        [
+          {
+            "node": "B2B Complete Art Certification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "B2B Complete Art Certification": {
+      "main": [
+        [
+          {
+            "node": "Download Certified Art",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z",
+      "id": "1",
+      "name": "PhotoCertif"
+    },
+    {
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z",
+      "id": "2",
+      "name": "Art Certification"
+    },
+    {
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z",
+      "id": "3",
+      "name": "Irys"
+    }
+  ],
+  "meta": {
+    "instanceId": "your-instance-id"
+  }
+}

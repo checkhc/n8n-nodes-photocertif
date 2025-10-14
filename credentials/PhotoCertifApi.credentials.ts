@@ -32,6 +32,30 @@ export class PhotoCertifApi implements ICredentialType {
 			required: true,
 		},
 		{
+			displayName: 'Pinata API Key',
+			name: 'pinataApiKey',
+			type: 'string',
+			typeOptions: {
+				password: true,
+			},
+			default: '',
+			placeholder: 'Your Pinata JWT or API Key',
+			description: 'Optional: Pinata API Key for IPFS uploads. Leave empty if not using Pinata.',
+			required: false,
+		},
+		{
+			displayName: 'Pinata Secret Key',
+			name: 'pinataSecretKey',
+			type: 'string',
+			typeOptions: {
+				password: true,
+			},
+			default: '',
+			placeholder: 'Your Pinata Secret Key',
+			description: 'Optional: Pinata Secret Key (only needed with API Key auth method, not JWT)',
+			required: false,
+		},
+		{
 			displayName: 'Important Notice',
 			name: 'notice',
 			type: 'notice',

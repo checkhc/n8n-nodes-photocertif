@@ -79,7 +79,7 @@ export class PhotoCertif implements INodeType {
 		icon: 'file:photocertif.png',
 		group: ['transform'],
 		version: 1,
-		subtitle: '={{$parameter["operation"]}} - {{$parameter["resourceType"]}}',
+		subtitle: '={{$parameter["operation"]}} - {{$parameter["resourceType"] === "image" ? "Photo (Pinata)" : "Art (Irys)"}}',
 		description: 'PhotoCertif - Document and art certification on Solana blockchain with AI authentication. Developed by CHECKHC. Learn more: https://www.checkhc.net',
 		defaults: {
 			name: 'PhotoCertif by CHECKHC',
@@ -111,18 +111,18 @@ export class PhotoCertif implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Document (media/docs)',
-						value: 'docs',
-						description: 'Document certification (PDF, DOCX, TXT, ZIP, etc.)',
+						name: 'Photo Certification Flexible (media/image)',
+						value: 'image',
+						description: 'Photo certification with Pinata IPFS storage',
 					},
 					{
-						name: 'Art Image (media/image2)',
+						name: 'Art Certification (media/image2)',
 						value: 'image2',
-						description: 'Art certification with AI analysis (JPG, PNG, GIF, etc.)',
+						description: 'Art certification with AI analysis and Irys/Arweave permanent storage',
 					},
 				],
-				default: 'docs',
-				description: 'Type of content to certify',
+				default: 'image2',
+				description: 'Type of certification flow: Pinata (image) or Irys/Arweave (image2)',
 			},
 
 			// Operation
@@ -167,6 +167,18 @@ export class PhotoCertif implements INodeType {
 						value: 'getPricing',
 						description: 'Get CHECKHC pricing for certification service',
 						action: 'Get pricing',
+					},
+					{
+						name: 'B2B Certify Full',
+						value: 'b2bCertifyFull',
+						description: 'Complete B2B certification (payment + Arweave + NFT)',
+						action: 'B2B Certify Full',
+					},
+					{
+						name: 'List NFTs',
+						value: 'listNfts',
+						description: 'List NFTs owned by wallet address',
+						action: 'List NFTs',
 					},
 				],
 				default: 'upload',
@@ -541,6 +553,257 @@ export class PhotoCertif implements INodeType {
 				default: 86400,
 				description: 'Maximum seconds to wait before timeout (default: 24 hours)',
 			},
+
+			// ============================================
+			// B2B CERTIFY FULL PARAMETERS
+			// ============================================
+			{
+				displayName: 'Storage ID',
+				name: 'storageIdB2b',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'iv_xxxxxxxxxxxxx',
+				description: 'The storage ID returned from upload',
+				required: true,
+			},
+			{
+				displayName: 'NFT Name',
+				name: 'nftName',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'My Document NFT',
+				description: 'Name of the NFT (title)',
+				required: true,
+			},
+			{
+				displayName: 'NFT Symbol',
+				name: 'nftSymbol',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: 'DOC',
+				placeholder: 'DOC',
+				description: 'NFT symbol (max 4 characters)',
+				required: true,
+			},
+			{
+				displayName: 'NFT Description',
+				name: 'nftDescription',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'Official document certification',
+				description: 'Description of the NFT',
+				required: true,
+			},
+			{
+				displayName: 'Owner Name',
+				name: 'ownerName',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'John Doe',
+				description: 'Owner name (max 20 characters)',
+				required: true,
+			},
+			{
+				displayName: 'External URL',
+				name: 'externalUrl',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'https://example.com',
+				description: 'External website URL (optional)',
+			},
+			{
+				displayName: 'Twitter URL',
+				name: 'twitterUrl',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'https://x.com/username',
+				description: 'Twitter/X profile URL (optional)',
+			},
+			{
+				displayName: 'Discord URL',
+				name: 'discordUrl',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'https://discord.gg/invite',
+				description: 'Discord server URL (optional)',
+			},
+			{
+				displayName: 'Instagram URL',
+				name: 'instagramUrl',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'https://instagram.com/username',
+				description: 'Instagram profile URL (optional)',
+			},
+			{
+				displayName: 'Telegram URL',
+				name: 'telegramUrl',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'https://t.me/username',
+				description: 'Telegram profile URL (optional)',
+			},
+			{
+				displayName: 'Medium URL',
+				name: 'mediumUrl',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'https://medium.com/@username',
+				description: 'Medium profile URL (optional)',
+			},
+			{
+				displayName: 'Wiki URL',
+				name: 'wikiUrl',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'https://wiki.example.com',
+				description: 'Wiki URL (optional)',
+			},
+			{
+				displayName: 'YouTube URL',
+				name: 'youtubeUrl',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'https://youtube.com/@channel',
+				description: 'YouTube channel URL (optional)',
+			},
+			{
+				displayName: 'Collection Mint Address',
+				name: 'collectionMintAddress',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'Collection Mint Address (optional)',
+				description: 'Solana collection mint address (optional)',
+			},
+			{
+				displayName: 'Affiliate Code',
+				name: 'affiliateCode',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: '',
+				placeholder: 'Affiliate code (optional)',
+				description: 'Affiliate tracking code (optional)',
+			},
+
+			// ============================================
+			// LIST NFTs PARAMETERS
+			// ============================================
+			{
+				displayName: 'Wallet Address',
+				name: 'walletAddress',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['listNfts'],
+					},
+				},
+				default: '',
+				placeholder: 'Leave empty to use Solana API credential wallet',
+				description: 'Solana wallet address to list NFTs from. Leave empty to automatically use the wallet from Solana API credential.',
+				required: false,
+			},
+			{
+				displayName: 'Filter by Name',
+				name: 'filterName',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['listNfts'],
+					},
+				},
+				default: '',
+				placeholder: 'My Document',
+				description: 'Optional: Filter NFTs by name (case insensitive)',
+			},
+			{
+				displayName: 'Limit',
+				name: 'limit',
+				type: 'number',
+				displayOptions: {
+					show: {
+						operation: ['listNfts'],
+					},
+				},
+				default: 50,
+				description: 'Maximum number of NFTs to return (default: 50, max: 1000)',
+				typeOptions: {
+					minValue: 1,
+					maxValue: 1000,
+				},
+			},
 		],
 	};
 
@@ -551,16 +814,20 @@ export class PhotoCertif implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				const operation = this.getNodeParameter('operation', i) as string;
-				const resourceType = this.getNodeParameter('resourceType', i, 'docs') as string;
-				const credentials = await this.getCredentials('photoCertifApi', i);
-
-				const baseUrl = (credentials.photoCertifUrl as string).replace(/\/$/, ''); // Remove trailing slash
-				const apiKey = credentials.apiKey as string;
-
-				// Build endpoint based on resource type
-				const endpoint = `/api/storage/${resourceType}`;
-
+				const resourceType = this.getNodeParameter('resourceType', i, 'image2') as string;
+				
 				let responseData: any;
+				let baseUrl: string = '';
+				let apiKey: string = '';
+				let endpoint: string = '';
+
+				// Get credentials only for operations that need API access (not listNfts)
+				if (operation !== 'listNfts') {
+					const credentials = await this.getCredentials('photoCertifApi', i);
+					baseUrl = (credentials.photoCertifUrl as string).replace(/\/$/, '');
+					apiKey = credentials.apiKey as string;
+					endpoint = `/api/storage/${resourceType}`;
+				}
 
 				// ============================================
 				// UPLOAD OPERATION
@@ -752,7 +1019,7 @@ export class PhotoCertif implements INodeType {
 
 						lastStatus = statusResponse.data.status;
 
-						if (lastStatus === 'certified') {
+						if (lastStatus === 'certified' || lastStatus === 'COMPLETED') {
 							// Success! Certification complete
 							const waitTimeSeconds = Math.floor((Date.now() - startTime) / 1000);
 							responseData = {
@@ -772,7 +1039,7 @@ export class PhotoCertif implements INodeType {
 					}
 
 					// If we exit the loop without finding certified status, it's a timeout
-					if (lastStatus !== 'certified') {
+					if (lastStatus !== 'certified' && lastStatus !== 'COMPLETED') {
 						throw new NodeOperationError(
 							this.getNode(),
 							`Certification timeout after ${maxWaitTime} seconds. Last status: ${lastStatus}. User may not have completed payment yet.`,
@@ -829,6 +1096,165 @@ export class PhotoCertif implements INodeType {
 					);
 
 					responseData = response.data;
+				}
+
+				// ============================================
+				// B2B CERTIFY FULL OPERATION
+				// ============================================
+				else if (operation === 'b2bCertifyFull') {
+					const storageId = this.getNodeParameter('storageIdB2b', i) as string;
+			
+					// Get Solana private key from credential
+					const solanaCredentials = await this.getCredentials('solanaApi', i);
+					const userPrivateKey = solanaCredentials.privateKey as string;
+			
+					const nftName = this.getNodeParameter('nftName', i) as string;
+					const nftSymbol = this.getNodeParameter('nftSymbol', i) as string;
+					const nftDescription = this.getNodeParameter('nftDescription', i) as string;
+					const ownerName = this.getNodeParameter('ownerName', i) as string;
+					const externalUrl = this.getNodeParameter('externalUrl', i, '') as string;
+					const twitterUrl = this.getNodeParameter('twitterUrl', i, '') as string;
+					const discordUrl = this.getNodeParameter('discordUrl', i, '') as string;
+					const instagramUrl = this.getNodeParameter('instagramUrl', i, '') as string;
+					const telegramUrl = this.getNodeParameter('telegramUrl', i, '') as string;
+					const mediumUrl = this.getNodeParameter('mediumUrl', i, '') as string;
+					const wikiUrl = this.getNodeParameter('wikiUrl', i, '') as string;
+					const youtubeUrl = this.getNodeParameter('youtubeUrl', i, '') as string;
+					const collectionMintAddress = this.getNodeParameter('collectionMintAddress', i, '') as string;
+					const affiliateCode = this.getNodeParameter('affiliateCode', i, '') as string;
+
+					const requestBody = {
+						storage_id: storageId,
+						user_private_key: userPrivateKey,
+						cert_data: {
+							name: nftName,
+							cert_symbol: nftSymbol,
+							cert_description: nftDescription,
+							cert_prop: ownerName,
+							external_url: externalUrl,
+							twitter_url: twitterUrl,
+							discord_url: discordUrl,
+							instagram_url: instagramUrl,
+							telegram_url: telegramUrl,
+							medium_url: mediumUrl,
+							wiki_url: wikiUrl,
+							youtube_url: youtubeUrl,
+						},
+						collection_mint_address: collectionMintAddress,
+						affiliate_code: affiliateCode,
+					};
+
+					const response = await axios.post(
+						`${baseUrl}${endpoint}/b2b-certify-full`,
+						requestBody,
+						{
+							timeout: 120000, // 2 minutes timeout
+							headers: {
+								'Authorization': `Bearer ${apiKey}`,
+								'Content-Type': 'application/json',
+							},
+							...getAxiosConfig(baseUrl),
+						},
+					);
+
+					responseData = response.data;
+				}
+
+				// ============================================
+				// LIST NFTs OPERATION
+				// ============================================
+				else if (operation === 'listNfts') {
+					let walletAddress = this.getNodeParameter('walletAddress', i, '') as string;
+					const filterName = this.getNodeParameter('filterName', i, '') as string;
+					const limit = this.getNodeParameter('limit', i, 50) as number;
+
+					// Get Solana credentials for wallet address and RPC URL
+					const solanaCredentials = await this.getCredentials('solanaApi', i);
+					
+					// If no wallet address provided, use Solana credential public key
+					if (!walletAddress) {
+						walletAddress = solanaCredentials.publicKey as string;
+					}
+
+					// Get RPC URL from credential
+					let rpcUrl: string;
+					if (solanaCredentials.rpcType === 'custom') {
+						rpcUrl = solanaCredentials.customRpcUrl as string;
+					} else {
+						const network = solanaCredentials.network as string;
+						if (network === 'mainnet-beta') {
+							rpcUrl = 'https://api.mainnet-beta.solana.com';
+						} else if (network === 'devnet') {
+							rpcUrl = 'https://api.devnet.solana.com';
+						} else {
+							rpcUrl = 'https://api.testnet.solana.com';
+						}
+					}
+
+					// Get assets owned by wallet using Helius DAS API
+					const response = await axios.post(
+						rpcUrl,
+						{
+							jsonrpc: '2.0',
+							id: 'n8n-digicryptostore',
+							method: 'getAssetsByOwner',
+							params: {
+								ownerAddress: walletAddress,
+								page: 1,
+								limit: limit,
+								displayOptions: {
+									showFungible: false,
+									showNativeBalance: false,
+								},
+							},
+						},
+						{
+							timeout: REQUEST_TIMEOUT,
+							headers: {
+								'Content-Type': 'application/json',
+							},
+						},
+					);
+
+					let nfts = response.data.result?.items || [];
+
+					// Filter by name if provided
+					if (filterName) {
+						const filterLower = filterName.toLowerCase();
+						nfts = nfts.filter((nft: any) => {
+							const name = nft.content?.metadata?.name || '';
+							return name.toLowerCase().includes(filterLower);
+						});
+					}
+
+					// Format NFTs for output
+					const formattedNfts = nfts.map((nft: any) => ({
+						mint_address: nft.id,
+						name: nft.content?.metadata?.name || 'Unknown',
+						symbol: nft.content?.metadata?.symbol || '',
+						description: nft.content?.metadata?.description || '',
+						image: nft.content?.links?.image || nft.content?.files?.[0]?.uri || '',
+						external_url: nft.content?.metadata?.external_url || '',
+						collection: nft.grouping?.find((g: any) => g.group_key === 'collection')?.group_value || null,
+						attributes: nft.content?.metadata?.attributes || [],
+						owner: nft.ownership?.owner || walletAddress,
+						created_at: nft.content?.metadata?.created_at || null,
+					}));
+
+					responseData = {
+						wallet_address: walletAddress,
+						total_nfts: formattedNfts.length,
+						filter_applied: filterName ? filterName : null,
+						nfts: formattedNfts,
+						// Highlight the last minted NFT (most recent created_at)
+						last_minted: formattedNfts.length > 0
+							? formattedNfts.reduce((latest: any, current: any) => {
+								const latestTime = latest.created_at ? new Date(latest.created_at).getTime() : 0;
+								const currentTime = current.created_at ? new Date(current.created_at).getTime() : 0;
+								return currentTime > latestTime ? current : latest;
+							})
+							: null,
+					};
 				}
 
 				// Unknown operation
