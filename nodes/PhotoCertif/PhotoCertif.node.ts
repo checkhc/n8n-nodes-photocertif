@@ -79,7 +79,7 @@ export class PhotoCertif implements INodeType {
 		icon: 'file:photocertif.png',
 		group: ['transform'],
 		version: 1,
-		subtitle: '={{$parameter["operation"]}} - {{$parameter["resourceType"] === "image" ? "Photo (Pinata)" : "Art (Irys)"}}',
+		subtitle: '={{$parameter["operation"] === "listNfts" ? "List NFTs" : ($parameter["resourceType"] === "image" ? "Photo (Pinata)" : $parameter["resourceType"] === "image2" ? "Art (Arweave)" : "Document (Arweave)")}}',
 		description: 'PhotoCertif - Document and art certification on Solana blockchain with AI authentication. Developed by CHECKHC. Learn more: https://www.checkhc.net',
 		defaults: {
 			name: 'PhotoCertif by CHECKHC',
@@ -133,46 +133,10 @@ export class PhotoCertif implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Upload',
-						value: 'upload',
-						description: 'Upload content to PhotoCertif',
-						action: 'Upload content',
-					},
-					{
-						name: 'Submit Certification',
-						value: 'certify',
-						description: 'Submit certification form (requires user to complete payment)',
-						action: 'Submit certification',
-					},
-					{
-						name: 'Get Status',
-						value: 'getStatus',
-						description: 'Get certification status',
-						action: 'Get status',
-					},
-					{
-						name: 'Wait for Certification',
-						value: 'waitForCertification',
-						description: 'Poll status until certified or timeout',
-						action: 'Wait for certification',
-					},
-					{
-						name: 'Download',
-						value: 'download',
-						description: 'Download certified content',
-						action: 'Download content',
-					},
-					{
-						name: 'Get Pricing',
-						value: 'getPricing',
-						description: 'Get CHECKHC pricing for certification service',
-						action: 'Get pricing',
-					},
-					{
-						name: 'B2B Certify Full',
+						name: 'Certify',
 						value: 'b2bCertifyFull',
-						description: 'Complete B2B certification (payment + Arweave + NFT)',
-						action: 'B2B Certify Full',
+						description: 'Complete certification (Upload + AI + Storage + NFT minting)',
+						action: 'Certify',
 					},
 					{
 						name: 'List NFTs',
@@ -181,385 +145,14 @@ export class PhotoCertif implements INodeType {
 						action: 'List NFTs',
 					},
 				],
-				default: 'upload',
+				default: 'b2bCertifyFull',
 			},
-
-			// ============================================
-			// UPLOAD PARAMETERS
-			// ============================================
-			{
-				displayName: 'Input Type',
-				name: 'inputType',
-				type: 'options',
-				displayOptions: {
-					show: {
-						operation: ['upload'],
-					},
-				},
-				options: [
-					{
-						name: 'URL',
-						value: 'url',
-						description: 'Download file from URL (Google Drive, Dropbox, CDN, etc.)',
-					},
-					{
-						name: 'Base64 String',
-						value: 'base64',
-						description: 'File content as base64 encoded string',
-					},
-				],
-				default: 'url',
-				description: 'How to provide the file content',
-			},
-			{
-				displayName: 'File URL',
-				name: 'fileUrl',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['upload'],
-						inputType: ['url'],
-					},
-				},
-				default: '',
-				placeholder: 'https://drive.google.com/uc?id=FILE_ID&export=download',
-				description: 'Public URL to download the file from (Google Drive, Dropbox, or direct link)',
-				required: true,
-			},
-			{
-				displayName: 'File (Base64)',
-				name: 'fileData',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['upload'],
-						inputType: ['base64'],
-					},
-				},
-				default: '',
-				placeholder: 'data:image/jpeg;base64,/9j/4AAQ...',
-				description: 'File as base64 string (with or without data URI prefix)',
-				required: true,
-			},
-			{
-				displayName: 'Title',
-				name: 'title',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['upload'],
-					},
-				},
-				default: '',
-				placeholder: 'Document Title',
-				description: 'Title for the uploaded content',
-				required: true,
-			},
-			{
-				displayName: 'Description',
-				name: 'description',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['upload'],
-					},
-				},
-				default: '',
-				placeholder: 'Optional description',
-				description: 'Description of the content (optional)',
-			},
-			{
-				displayName: 'File Extension',
-				name: 'fileExtension',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['upload'],
-						inputType: ['url'],
-					},
-				},
-				default: 'pdf',
-				placeholder: 'pdf, zip, jpg, png, docx, etc.',
-				description: 'File extension (required for URL uploads as they often lack extension)',
-			},
-
-			// ============================================
-			// GET PRICING PARAMETERS
-			// ============================================
-			{
-				displayName: 'File Size (Bytes)',
-				name: 'fileSize',
-				type: 'number',
-				displayOptions: {
-					show: {
-						operation: ['getPricing'],
-					},
-				},
-				default: 0,
-				placeholder: '500000',
-				description: 'Processed file size in bytes (optional, for Irys cost calculation)',
-			},
-			{
-				displayName: 'Original File Size (Bytes)',
-				name: 'originalSize',
-				type: 'number',
-				displayOptions: {
-					show: {
-						operation: ['getPricing'],
-					},
-				},
-				default: 0,
-				placeholder: '2000000',
-				description: 'Original file size in bytes (optional, for Irys cost calculation)',
-			},
-
-			// ============================================
-			// CERTIFY PARAMETERS (15 fields total!)
-			// ============================================
-			{
-				displayName: 'Storage ID',
-				name: 'storageId',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify', 'getStatus', 'download', 'waitForCertification'],
-					},
-				},
-				default: '',
-				placeholder: 'iv_xxxxxxxxxxxxx',
-				description: 'The storage ID returned from upload',
-				required: true,
-			},
-
-			// Required certification fields
-			{
-				displayName: 'Certification Name',
-				name: 'name',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'Contract2025',
-				description: 'Name for the certification (alphanumeric only)',
-				required: true,
-			},
-			{
-				displayName: 'Symbol',
-				name: 'cert_symbol',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'CNTR',
-				description: 'Symbol for the NFT (4 uppercase letters max)',
-				required: true,
-			},
-			{
-				displayName: 'Description',
-				name: 'cert_description',
-				type: 'string',
-				typeOptions: {
-					rows: 3,
-				},
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'Description of the certification',
-				description: 'Detailed description (alphanumeric + spaces)',
-				required: true,
-			},
-			{
-				displayName: 'Owner',
-				name: 'cert_prop',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'Company ABC Inc',
-				description: 'Owner name (20 characters max, alphanumeric + spaces)',
-				required: true,
-			},
-
-			// Optional certification fields
-			{
-				displayName: 'Collection Mint Address',
-				name: 'collection_mint_address',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'BMCVo8ehcpR2E92d2RUqyybQ7fMeDUWpMxNbaAsQqV8i',
-				description: 'NFT Collection address (optional)',
-			},
-
-			// External Links section
-			{
-				displayName: 'External Links',
-				name: 'externalLinksNotice',
-				type: 'notice',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				// @ts-ignore
-				text: 'All external links are optional and will be included in NFT metadata',
-			},
-			{
-				displayName: 'Website URL',
-				name: 'external_url',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'https://your-website.com',
-				description: 'Website or project URL',
-			},
-			{
-				displayName: 'Twitter/X URL',
-				name: 'twitter_url',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'https://x.com/username',
-				description: 'Twitter/X profile URL',
-			},
-			{
-				displayName: 'Discord URL',
-				name: 'discord_url',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'https://discord.gg/invite',
-				description: 'Discord server invite URL',
-			},
-			{
-				displayName: 'Instagram URL',
-				name: 'instagram_url',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'https://instagram.com/username',
-				description: 'Instagram profile URL',
-			},
-			{
-				displayName: 'Telegram URL',
-				name: 'telegram_url',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'https://t.me/channel',
-				description: 'Telegram channel URL',
-			},
-			{
-				displayName: 'Medium URL',
-				name: 'medium_url',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'https://medium.com/@username',
-				description: 'Medium blog URL',
-			},
-			{
-				displayName: 'Wiki URL',
-				name: 'wiki_url',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'https://wiki.example.com',
-				description: 'Wiki or documentation URL',
-			},
-			{
-				displayName: 'YouTube URL',
-				name: 'youtube_url',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['certify'],
-					},
-				},
-				default: '',
-				placeholder: 'https://youtube.com/@channel',
-				description: 'YouTube channel URL',
-			},
-
-			// ============================================
-			// WAIT FOR CERTIFICATION PARAMETERS
-			// ============================================
-			{
-				displayName: 'Polling Interval (seconds)',
-				name: 'pollingInterval',
-				type: 'number',
-				displayOptions: {
-					show: {
-						operation: ['waitForCertification'],
-					},
-				},
-				default: 300,
-				description: 'Seconds between status checks (default: 5 minutes)',
-			},
-			{
-				displayName: 'Max Wait Time (seconds)',
-				name: 'maxWaitTime',
-				type: 'number',
-				displayOptions: {
-					show: {
-						operation: ['waitForCertification'],
-					},
-				},
-				default: 86400,
-				description: 'Maximum seconds to wait before timeout (default: 24 hours)',
-			},
-
 			// ============================================
 			// B2B CERTIFY FULL PARAMETERS
 			// ============================================
 			{
-				displayName: 'Storage ID',
-				name: 'storageIdB2b',
+				displayName: 'File URL',
+				name: 'fileUrl',
 				type: 'string',
 				displayOptions: {
 					show: {
@@ -567,8 +160,8 @@ export class PhotoCertif implements INodeType {
 					},
 				},
 				default: '',
-				placeholder: 'iv_xxxxxxxxxxxxx',
-				description: 'The storage ID returned from upload',
+				placeholder: 'https://example.com/image.jpg',
+				description: 'Public URL of the file to certify',
 				required: true,
 			},
 			{
@@ -596,7 +189,7 @@ export class PhotoCertif implements INodeType {
 				},
 				default: 'DOC',
 				placeholder: 'DOC',
-				description: 'NFT symbol (max 4 characters)',
+				description: 'NFT symbol (max 4 uppercase letters A-Z, auto-converted)',
 				required: true,
 			},
 			{
@@ -624,8 +217,20 @@ export class PhotoCertif implements INodeType {
 				},
 				default: '',
 				placeholder: 'John Doe',
-				description: 'Owner name (max 20 characters)',
+				description: 'Owner name (max 20 alphanumeric characters + spaces)',
 				required: true,
+			},
+			{
+				displayName: 'Enable C2PA',
+				name: 'enableC2pa',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						operation: ['b2bCertifyFull'],
+					},
+				},
+				default: false,
+				description: 'Enable C2PA metadata embedding for enhanced authenticity',
 			},
 			{
 				displayName: 'External URL',
@@ -638,7 +243,7 @@ export class PhotoCertif implements INodeType {
 				},
 				default: '',
 				placeholder: 'https://example.com',
-				description: 'External website URL (optional)',
+				description: 'External website URL (optional, fallback available)',
 			},
 			{
 				displayName: 'Twitter URL',
@@ -651,7 +256,7 @@ export class PhotoCertif implements INodeType {
 				},
 				default: '',
 				placeholder: 'https://x.com/username',
-				description: 'Twitter/X profile URL (optional)',
+				description: 'Twitter/X profile URL (optional, fallback available)',
 			},
 			{
 				displayName: 'Discord URL',
@@ -664,7 +269,7 @@ export class PhotoCertif implements INodeType {
 				},
 				default: '',
 				placeholder: 'https://discord.gg/invite',
-				description: 'Discord server URL (optional)',
+				description: 'Discord server URL (optional, fallback available)',
 			},
 			{
 				displayName: 'Instagram URL',
@@ -677,7 +282,7 @@ export class PhotoCertif implements INodeType {
 				},
 				default: '',
 				placeholder: 'https://instagram.com/username',
-				description: 'Instagram profile URL (optional)',
+				description: 'Instagram profile URL (optional, fallback available)',
 			},
 			{
 				displayName: 'Telegram URL',
@@ -689,8 +294,8 @@ export class PhotoCertif implements INodeType {
 					},
 				},
 				default: '',
-				placeholder: 'https://t.me/username',
-				description: 'Telegram profile URL (optional)',
+				placeholder: 'https://t.me/channel',
+				description: 'Telegram channel URL (optional, fallback available)',
 			},
 			{
 				displayName: 'Medium URL',
@@ -703,7 +308,7 @@ export class PhotoCertif implements INodeType {
 				},
 				default: '',
 				placeholder: 'https://medium.com/@username',
-				description: 'Medium profile URL (optional)',
+				description: 'Medium blog URL (optional, fallback available)',
 			},
 			{
 				displayName: 'Wiki URL',
@@ -716,7 +321,7 @@ export class PhotoCertif implements INodeType {
 				},
 				default: '',
 				placeholder: 'https://wiki.example.com',
-				description: 'Wiki URL (optional)',
+				description: 'Wiki documentation URL (optional, fallback available)',
 			},
 			{
 				displayName: 'YouTube URL',
@@ -729,7 +334,7 @@ export class PhotoCertif implements INodeType {
 				},
 				default: '',
 				placeholder: 'https://youtube.com/@channel',
-				description: 'YouTube channel URL (optional)',
+				description: 'YouTube channel URL (optional, fallback available)',
 			},
 			{
 				displayName: 'Collection Mint Address',
@@ -743,19 +348,6 @@ export class PhotoCertif implements INodeType {
 				default: '',
 				placeholder: 'Collection Mint Address (optional)',
 				description: 'Solana collection mint address (optional)',
-			},
-			{
-				displayName: 'Affiliate Code',
-				name: 'affiliateCode',
-				type: 'string',
-				displayOptions: {
-					show: {
-						operation: ['b2bCertifyFull'],
-					},
-				},
-				default: '',
-				placeholder: 'Affiliate code (optional)',
-				description: 'Affiliate tracking code (optional)',
 			},
 
 			// ============================================
@@ -826,292 +418,43 @@ export class PhotoCertif implements INodeType {
 					const credentials = await this.getCredentials('photoCertifApi', i);
 					baseUrl = (credentials.photoCertifUrl as string).replace(/\/$/, '');
 					apiKey = credentials.apiKey as string;
+					// Build endpoint based on resourceType
 					endpoint = `/api/storage/${resourceType}`;
-				}
-
-				// ============================================
-				// UPLOAD OPERATION
-				// ============================================
-				if (operation === 'upload') {
-					const title = this.getNodeParameter('title', i) as string;
-					const description = this.getNodeParameter('description', i, '') as string;
-					const inputType = this.getNodeParameter('inputType', i, 'base64') as string;
-					const fileExtension = this.getNodeParameter('fileExtension', i, '') as string;
-
-					let fileData: string;
-
-					if (inputType === 'url') {
-						// Download file from URL and convert to base64
-						const fileUrl = this.getNodeParameter('fileUrl', i) as string;
-
-						// SECURITY: Validate URL to prevent SSRF attacks
-						try {
-							validateUrl(fileUrl);
-						} catch (error: any) {
-							throw new NodeOperationError(
-								this.getNode(),
-								`Invalid URL: ${error.message}`,
-								{ itemIndex: i },
-							);
-						}
-
-						const fileResponse = await axios.get(fileUrl, {
-							timeout: DOWNLOAD_TIMEOUT,
-							responseType: 'arraybuffer',
-							maxContentLength: MAX_FILE_SIZE,
-							maxBodyLength: MAX_FILE_SIZE,
-							headers: {
-								'User-Agent': 'n8n-photocertif/1.0',
-							},
-						});
-
-						// Detect content type from response headers or URL extension
-						const contentType = fileResponse.headers['content-type'] || 'application/octet-stream';
-						const base64Data = Buffer.from(fileResponse.data).toString('base64');
-
-						// Add data URI prefix if not present
-						if (base64Data.startsWith('data:')) {
-							fileData = base64Data;
-						} else {
-							fileData = `data:${contentType};base64,${base64Data}`;
-						}
-					} else {
-						// Base64 input
-						fileData = this.getNodeParameter('fileData', i) as string;
-					}
-
-					const requestBody: any = {
-						file: fileData,
-						title,
-						description,
-					};
-
-					// Add file_extension if provided (important for URL uploads)
-					if (fileExtension) {
-						requestBody.file_extension = fileExtension;
-					}
-
-					const response = await axios.post(
-						`${baseUrl}${endpoint}/upload/iv_route`,
-						requestBody,
-						{
-							timeout: REQUEST_TIMEOUT,
-							headers: {
-								'Authorization': `Bearer ${apiKey}`,
-								'Content-Type': 'application/json',
-							},
-							...getAxiosConfig(baseUrl),
-						},
-					);
-
-					responseData = response.data;
-				}
-
-				// ============================================
-				// GET STATUS OPERATION
-				// ============================================
-				else if (operation === 'getStatus') {
-					const storageId = this.getNodeParameter('storageId', i) as string;
-
-					const response = await axios.get(
-						`${baseUrl}${endpoint}/status/iv_route?id=${storageId}`,
-						{
-							timeout: REQUEST_TIMEOUT,
-							headers: {
-								'Authorization': `Bearer ${apiKey}`,
-							},
-							...getAxiosConfig(baseUrl),
-						},
-					);
-
-					responseData = response.data;
-				}
-
-				// ============================================
-				// CERTIFY OPERATION (Submit form)
-				// ============================================
-				else if (operation === 'certify') {
-					const storageId = this.getNodeParameter('storageId', i) as string;
-					const name = this.getNodeParameter('name', i) as string;
-					const cert_symbol = this.getNodeParameter('cert_symbol', i) as string;
-					const cert_description = this.getNodeParameter('cert_description', i) as string;
-					const cert_prop = this.getNodeParameter('cert_prop', i) as string;
-
-					// Optional fields
-					const collection_mint_address = this.getNodeParameter('collection_mint_address', i, '') as string;
-					const external_url = this.getNodeParameter('external_url', i, '') as string;
-					const twitter_url = this.getNodeParameter('twitter_url', i, '') as string;
-					const discord_url = this.getNodeParameter('discord_url', i, '') as string;
-					const instagram_url = this.getNodeParameter('instagram_url', i, '') as string;
-					const telegram_url = this.getNodeParameter('telegram_url', i, '') as string;
-					const medium_url = this.getNodeParameter('medium_url', i, '') as string;
-					const wiki_url = this.getNodeParameter('wiki_url', i, '') as string;
-					const youtube_url = this.getNodeParameter('youtube_url', i, '') as string;
-
-					const response = await axios.post(
-						`${baseUrl}${endpoint}/certify/iv_route`,
-						{
-							id: storageId,
-							name,
-							cert_symbol,
-							cert_description,
-							cert_prop,
-							cert_C2PA: false, // Not implemented yet
-							collection_mint_address,
-							external_url,
-							twitter_url,
-							discord_url,
-							instagram_url,
-							telegram_url,
-							medium_url,
-							wiki_url,
-							youtube_url,
-						},
-						{
-							timeout: REQUEST_TIMEOUT,
-							headers: {
-								'Authorization': `Bearer ${apiKey}`,
-								'Content-Type': 'application/json',
-							},
-													...getAxiosConfig(baseUrl),
-						},
-					);
-
-					responseData = {
-						...response.data,
-						notice: 'Certification form submitted. User must complete payment and NFT minting in PhotoCertif interface.',
-						certification_url: `${baseUrl}/media/${resourceType}/certification?iv_storageid=${storageId}`,
-					};
-				}
-
-				// ============================================
-				// WAIT FOR CERTIFICATION (Polling)
-				// ============================================
-				else if (operation === 'waitForCertification') {
-					const storageId = this.getNodeParameter('storageId', i) as string;
-					// SECURITY: Enforce minimum polling interval to prevent API spam
-					const pollingInterval = Math.max(
-						MIN_POLLING_INTERVAL,
-						this.getNodeParameter('pollingInterval', i, 300) as number
-					);
-					const maxWaitTime = this.getNodeParameter('maxWaitTime', i, 86400) as number;
-
-					const startTime = Date.now();
-					const endTime = startTime + (maxWaitTime * 1000);
-
-					let attempts = 0;
-					let lastStatus = 'unknown';
-
-					while (Date.now() < endTime) {
-						attempts++;
-
-						// Check status
-						const statusResponse = await axios.get(
-							`${baseUrl}${endpoint}/status/iv_route?id=${storageId}`,
-							{
-								timeout: REQUEST_TIMEOUT,
-								headers: {
-									'Authorization': `Bearer ${apiKey}`,
-								},
-								...getAxiosConfig(baseUrl),
-							},
-						);
-
-						lastStatus = statusResponse.data.status;
-
-						if (lastStatus === 'certified' || lastStatus === 'COMPLETED') {
-							// Success! Certification complete
-							const waitTimeSeconds = Math.floor((Date.now() - startTime) / 1000);
-							responseData = {
-								success: true,
-								status: 'certified',
-								storage_id: storageId,
-								...statusResponse.data,
-								wait_time_seconds: waitTimeSeconds,
-								attempts,
-								message: `Certification completed after ${waitTimeSeconds} seconds (${attempts} checks)`,
-							};
-							break;
-						}
-
-						// Wait before next check
-						await new Promise((resolve) => setTimeout(resolve, pollingInterval * 1000));
-					}
-
-					// If we exit the loop without finding certified status, it's a timeout
-					if (lastStatus !== 'certified' && lastStatus !== 'COMPLETED') {
-						throw new NodeOperationError(
-							this.getNode(),
-							`Certification timeout after ${maxWaitTime} seconds. Last status: ${lastStatus}. User may not have completed payment yet.`,
-						);
-					}
-				}
-
-				// ============================================
-				// DOWNLOAD OPERATION
-				// ============================================
-				else if (operation === 'download') {
-					const storageId = this.getNodeParameter('storageId', i) as string;
-
-					const response = await axios.get(
-						`${baseUrl}${endpoint}/download/iv_route?id=${storageId}`,
-						{
-							timeout: REQUEST_TIMEOUT,
-							headers: {
-								'Authorization': `Bearer ${apiKey}`,
-							},
-							...getAxiosConfig(baseUrl),
-						},
-					);
-
-					responseData = response.data;
-				}
-
-				// ============================================
-				// GET PRICING OPERATION
-				// ============================================
-				else if (operation === 'getPricing') {
-					// Get optional parameters
-					const fileSize = this.getNodeParameter('fileSize', i, 0) as number;
-					const originalSize = this.getNodeParameter('originalSize', i, 0) as number;
-					
-					// Build query params
-					let queryParams = `type=${resourceType}`;
-					if (fileSize > 0) {
-						queryParams += `&fileSize=${fileSize}`;
-					}
-					if (originalSize > 0) {
-						queryParams += `&originalSize=${originalSize}`;
-					}
-					
-					const response = await axios.get(
-						`${baseUrl}/api/pricing/service?${queryParams}`,
-						{
-							timeout: REQUEST_TIMEOUT,
-							headers: {
-								'Authorization': `Bearer ${apiKey}`,
-							},
-							...getAxiosConfig(baseUrl),
-						},
-					);
-
-					responseData = response.data;
 				}
 
 				// ============================================
 				// B2B CERTIFY FULL OPERATION
 				// ============================================
-				else if (operation === 'b2bCertifyFull') {
-					const storageId = this.getNodeParameter('storageIdB2b', i) as string;
+				if (operation === 'b2bCertifyFull') {
+					const fileUrl = this.getNodeParameter('fileUrl', i) as string;
 			
 					// Get Solana private key from credential
 					const solanaCredentials = await this.getCredentials('solanaApi', i);
 					const userPrivateKey = solanaCredentials.privateKey as string;
+					
+					// Get PhotoCertif credentials for Pinata API keys
+					const credentials = await this.getCredentials('photoCertifApi', i);
+					const pinataApiKey = (credentials.pinataApiKey as string) || '';
+					const pinataSecretKey = (credentials.pinataSecretKey as string) || '';
 			
 					const nftName = this.getNodeParameter('nftName', i) as string;
-					const nftSymbol = this.getNodeParameter('nftSymbol', i) as string;
+					let nftSymbol = this.getNodeParameter('nftSymbol', i) as string;
 					const nftDescription = this.getNodeParameter('nftDescription', i) as string;
-					const ownerName = this.getNodeParameter('ownerName', i) as string;
+					let ownerName = this.getNodeParameter('ownerName', i) as string;
+					
+					// Validation: Symbol must be uppercase, max 4 chars, A-Z only
+					nftSymbol = nftSymbol.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4);
+					if (!nftSymbol || nftSymbol.length === 0) {
+						throw new NodeOperationError(this.getNode(), 'Symbol must contain at least 1 uppercase letter (A-Z)');
+					}
+					
+					// Validation: Owner name max 20 chars, alphanumeric + spaces only
+					ownerName = ownerName.replace(/[^a-zA-Z0-9 ]/g, '').slice(0, 20);
+					if (!ownerName || ownerName.trim().length === 0) {
+						throw new NodeOperationError(this.getNode(), 'Owner name is required (max 20 alphanumeric characters)');
+					}
+					
+					const enableC2pa = this.getNodeParameter('enableC2pa', i, false) as boolean;
 					const externalUrl = this.getNodeParameter('externalUrl', i, '') as string;
 					const twitterUrl = this.getNodeParameter('twitterUrl', i, '') as string;
 					const discordUrl = this.getNodeParameter('discordUrl', i, '') as string;
@@ -1121,34 +464,35 @@ export class PhotoCertif implements INodeType {
 					const wikiUrl = this.getNodeParameter('wikiUrl', i, '') as string;
 					const youtubeUrl = this.getNodeParameter('youtubeUrl', i, '') as string;
 					const collectionMintAddress = this.getNodeParameter('collectionMintAddress', i, '') as string;
-					const affiliateCode = this.getNodeParameter('affiliateCode', i, '') as string;
 
 					const requestBody = {
-						storage_id: storageId,
+						file_url: fileUrl,
+						title: nftName,
+						description: nftDescription,
 						user_private_key: userPrivateKey,
-						cert_data: {
-							name: nftName,
-							cert_symbol: nftSymbol,
-							cert_description: nftDescription,
-							cert_prop: ownerName,
-							external_url: externalUrl,
-							twitter_url: twitterUrl,
-							discord_url: discordUrl,
-							instagram_url: instagramUrl,
-							telegram_url: telegramUrl,
-							medium_url: mediumUrl,
-							wiki_url: wikiUrl,
-							youtube_url: youtubeUrl,
-						},
-						collection_mint_address: collectionMintAddress,
-						affiliate_code: affiliateCode,
+						collection_mint_address: collectionMintAddress || null,
+						cert_photoname: nftName,
+						cert_symbol: nftSymbol,
+						cert_description: nftDescription,
+						cert_prop: ownerName,
+						cert_c2pa: enableC2pa,
+						pinata_api: pinataApiKey,
+						pinata_api_secret: pinataSecretKey,
+						external_url: externalUrl,
+						twitter_url: twitterUrl,
+						discord_url: discordUrl,
+						instagram_url: instagramUrl,
+						telegram_url: telegramUrl,
+						medium_url: mediumUrl,
+						wiki_url: wikiUrl,
+						youtube_url: youtubeUrl,
 					};
 
 					const response = await axios.post(
 						`${baseUrl}${endpoint}/b2b-certify-full`,
 						requestBody,
 						{
-							timeout: 120000, // 2 minutes timeout
+							timeout: 360000, // 6 minutes timeout (upload + AI + C2PA + Pinata + mint)
 							headers: {
 								'Authorization': `Bearer ${apiKey}`,
 								'Content-Type': 'application/json',

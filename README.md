@@ -11,6 +11,7 @@ Custom n8n node for **PhotoCertif** - Document and Art certification on Solana b
 - **💰 Get Pricing** - Retrieve current CHECKHC pricing in real-time
 - **📝 Submit Certification** - Prepare certification with all metadata
   - ✅ All optional fields supported (social links, collection, etc.)
+  - 🚧 **C2PA Support** - Content authenticity certification (In Development)
 - **🔍 Get Status** - Monitor certification progress
 - **⏳ Wait for Certification** - Poll status until completion (with timeout)
 - **📥 Download Content** - Retrieve certified files
@@ -651,3 +652,16 @@ Trigger: Webhook or Schedule
 - Perfect for Google Sheets integration
 
 See **[URL_SUPPORT_GUIDE.md](./URL_SUPPORT_GUIDE.md)** and **[BATCH_CERTIFICATION_GUIDE.md](./BATCH_CERTIFICATION_GUIDE.md)** for complete documentation.
+
+---
+
+## 🚧 Features In Development
+
+### **C2PA Content Authenticity** (Status: Dev)
+- Integration of Coalition for Content Provenance and Authenticity (C2PA) standard
+- Cryptographic content credentials embedded in certified media
+- Tamper-evident provenance tracking
+- Industry-standard verification for content authenticity
+- **Expected**: Future release
+
+---
