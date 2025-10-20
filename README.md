@@ -1,5 +1,12 @@
 # n8n-nodes-photocertif
 
+[![npm version](https://img.shields.io/npm/v/n8n-nodes-photocertif)](https://www.npmjs.com/package/n8n-nodes-photocertif)
+[![Status](https://img.shields.io/badge/Status-Beta-yellow)](https://github.com/checkhc/n8n-nodes-photocertif)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Discord Support](https://img.shields.io/badge/Support-Discord-5865F2)](https://discord.com/channels/1324516144979382335/1429512698504151200)
+
+> ⚠️ **Beta Status**: This node is in active development. Features are functional but we're continuously improving based on user feedback. Join our [Discord channel](https://discord.com/channels/1324516144979382335/1429512698504151200) for support and updates.
+
 Custom n8n node for **PhotoCertif** - Document and Art certification on Solana blockchain with **fully automated B2B workflows**.
 
 ## 🎯 Features
@@ -483,6 +490,31 @@ Loop: For each pending
 
 ---
 
+## 🚧 Known Issues & Roadmap (Beta)
+
+### **✅ Working & Tested:**
+- Upload (Base64 & URL)
+- Get Pricing
+- Automated CHECKHC payments
+- Server-side NFT minting
+- Batch certification workflows
+- Google Drive/Dropbox integration
+
+### **🐛 Known Issues:**
+- C2PA integration is in development (not yet production-ready)
+- Some edge cases in large file uploads (>50MB) may need optimization
+- Rate limiting on public RPC endpoints may affect high-volume batches
+
+### **🛣️ Roadmap:**
+- C2PA content authenticity (Q1 2025)
+- Enhanced metadata validation
+- Improved error messages
+- More file format support
+
+**Report issues**: Join our [Discord](https://discord.com/channels/1324516144979382335/1429512698504151200) or [GitHub Issues](https://github.com/checkhc/n8n-nodes-photocertif/issues)
+
+---
+
 ## 🐛 Troubleshooting
 
 ### "API Key invalid"
@@ -528,6 +560,10 @@ Loop: For each pending
 
 ## 🤝 Support
 
+- **Discord Channel** (Primary): https://discord.com/channels/1324516144979382335/1429512698504151200
+  - Real-time community support
+  - Direct access to developers
+  - Share workflows and tips
 - **GitHub Issues**: https://github.com/checkhc/n8n-nodes-photocertif/issues
 - **PhotoCertif Support**: support@photocertif.com
 - **n8n Community**: https://community.n8n.io
