@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-photocertif",
   "version": "1.2.0",
-  "description": "PhotoCertif - Document and art certification on Solana blockchain with AI authentication. Developed by CHECKHC.",
+  "description": "PhotoCertif - Image/Photo and Art certification on Solana blockchain with AI authentication. Powered by CHECKHC.",
   "keywords": [
     "n8n",
     "n8n-community-node-package",
@@ -11,9 +11,12 @@
     "solana",
     "nft",
     "certification",
-    "document",
+    "image",
+    "photo",
+    "art",
     "ai-authentication",
-    "art-certification"
+    "art-certification",
+    "image-verification"
   ],
   "license": "MIT",
   "homepage": "https://www.checkhc.net",
@@ -32,7 +35,9 @@
     "prepublishOnly": "npm run build && npm run lint -s"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "SECURITY.md"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,

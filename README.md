@@ -1,13 +1,27 @@
 # n8n-nodes-photocertif
 
+<div align="center">
+
 [![npm version](https://img.shields.io/npm/v/n8n-nodes-photocertif)](https://www.npmjs.com/package/n8n-nodes-photocertif)
 [![Status](https://img.shields.io/badge/Status-Beta-yellow)](https://github.com/checkhc/n8n-nodes-photocertif)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![CHECKHC](https://img.shields.io/badge/Powered_by-CHECKHC-orange?style=flat&logo=solana)](https://www.checkhc.net)
 [![Discord Support](https://img.shields.io/badge/Support-Discord-5865F2)](https://discord.com/channels/1324516144979382335/1429512698504151200)
+
+### 🎨 **Image & Art Certification on Solana Blockchain**
+### 🤖 **Fully Automated B2B Workflows with AI Authentication**
+
+**Powered by [CHECKHC](https://www.checkhc.net) - The Web3 Certification Ecosystem**
+
+[🌐 Visit CHECKHC.net](https://www.checkhc.net) | [📦 PhotoCertif Platform](https://app.photocertif.com) | [💬 Discord Community](https://discord.com/channels/1324516144979382335/1429512698504151200)
+
+</div>
+
+---
 
 > ⚠️ **Beta Status**: This node is in active development. Features are functional but we're continuously improving based on user feedback. Join our [Discord channel](https://discord.com/channels/1324516144979382335/1429512698504151200) for support and updates.
 
-Custom n8n node for **PhotoCertif** - Document and Art certification on Solana blockchain with **fully automated B2B workflows**.
+Custom n8n node for **PhotoCertif** - **Image/Photo and Art certification** on Solana blockchain with **fully automated B2B workflows**.
 
 ## 🎯 Features
 
@@ -458,7 +472,7 @@ Loop: For each pending
 - **Art (media/image2)**: ~1 USD per certification
 
 **Blockchain Fees (paid in SOL from user wallet):**
-- **Arweave Storage**: ~0.02-0.05 SOL
+- **Secure Storage**: ~0.02-0.05 SOL
 - **NFT Minting**: ~0.005 SOL
 - **Total**: ~0.025-0.055 SOL per certification
 
@@ -539,13 +553,42 @@ Loop: For each pending
 
 ---
 
-## 🔐 Security Best Practices
+## 🔐 Security & Privacy
+
+### **Security Best Practices**
 
 1. **API Keys**: Store in n8n credentials (encrypted)
 2. **HTTPS Only**: Always use HTTPS PhotoCertif URLs
 3. **Scope Limitation**: Only grant necessary scopes
 4. **Key Rotation**: Regenerate keys periodically
 5. **Test Environment**: Use test keys for development
+
+### **🇪🇺 GDPR Compliance**
+
+**CHECKHC is fully compliant with EU General Data Protection Regulation (GDPR):**
+
+#### **Data Processing:**
+- ✅ **Data Minimization** - Only necessary data is collected
+- ✅ **Purpose Limitation** - Data used only for certification purposes
+- ✅ **Encryption** - All data encrypted in transit (HTTPS) and at rest
+- ✅ **Right to Access** - Users can download their certification data anytime
+- ✅ **Right to Erasure** - Account deletion removes personal data (blockchain records are pseudonymized)
+
+#### **Privacy by Design:**
+- ✅ **No Tracking** - No analytics cookies or user tracking
+- ✅ **Pseudonymization** - Blockchain addresses don't contain personal data
+- ✅ **Data Portability** - Export all certification metadata in JSON format
+- ✅ **Transparent Processing** - Clear documentation of data flows
+
+#### **Legal Basis:**
+- Contract Performance (certification services)
+- Legitimate Interest (fraud prevention, service improvement)
+- Consent (optional newsletter, marketing)
+
+#### **Data Protection Officer:**
+For GDPR inquiries: **privacy@checkhc.net**
+
+📄 **[Privacy Policy](https://www.checkhc.net/privacy)** | 📄 **[Terms of Service](https://www.checkhc.net/terms)**
 
 ---
 
@@ -576,9 +619,48 @@ MIT License - See LICENSE file for details
 
 ---
 
+## 🏢 About CHECKHC
+
+**[CHECKHC](https://www.checkhc.net)** is a pioneering Web3 ecosystem for digital content certification and authentication.
+
+### **Our Solutions:**
+
+- 🎨 **[PhotoCertif](https://app.photocertif.com)** - Image & Art Certification with AI Authentication
+- 📄 **[DigiCryptoStore](https://app.photocertif.com)** - Document Certification with Secure Blockchain Storage
+- 🪙 **CHECKHC Token** - Native utility token on Solana blockchain
+- 🔗 **Blockchain Integration** - Solana + Secure Decentralized Storage
+- 🤖 **AI-Powered** - Advanced detection for authenticity verification
+
+### **Why Choose CHECKHC?**
+
+- ✅ **Flexible Storage** - Permanent (for monetization) or Erasable (GDPR-compliant)
+- ✅ **Blockchain Proof** - Immutable NFT certificates on Solana
+- ✅ **AI Authentication** - Advanced AI detection (4 levels)
+- ✅ **Full Automation** - Zero manual intervention with n8n
+- ✅ **Enterprise Ready** - High-volume B2B workflows
+- ✅ **GDPR Compliant** - EU data protection regulation compliant
+- ✅ **Open Source** - Transparent & community-driven
+
+### **🚀 Get Started:**
+
+1. **Explore:** Visit [www.checkhc.net](https://www.checkhc.net)
+2. **Try it:** Sign up at [app.photocertif.com](https://app.photocertif.com)
+3. **Get CHECKHC Tokens:** [Buy on Jupiter](https://jup.ag/swap/SOL-CHECKHC)
+4. **Automate:** Install this n8n node for B2B workflows
+5. **Join Community:** [Discord Channel](https://discord.com/channels/1324516144979382335/1429512698504151200)
+
+### **💼 Enterprise Solutions:**
+
+Looking for custom integration or high-volume licensing?
+
+📧 Contact: **contact@checkhc.net**  
+🌐 Website: **[www.checkhc.net](https://www.checkhc.net)**
+
+---
+
 ## 🎉 Credits
 
-Built by [CheckHC](https://github.com/checkhc) for the PhotoCertif ecosystem.
+Built with ❤️ by the **[CHECKHC](https://www.checkhc.net)** team for the Web3 certification ecosystem.
 
 ---
 
