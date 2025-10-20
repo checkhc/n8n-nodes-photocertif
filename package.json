@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-photocertif",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "PhotoCertif - Image/Photo and Art certification on Solana blockchain with AI authentication. Powered by CHECKHC.",
   "keywords": [
     "n8n",
@@ -57,9 +57,6 @@
     "n8n-workflow": "^1.0.0",
     "prettier": "^3.0.0",
     "typescript": "^5.0.0"
-  },
-  "peerDependencies": {
-    "n8n-nodes-solana-swap": "^1.5.0"
   },
   "dependencies": {
     "axios": "^1.6.0",

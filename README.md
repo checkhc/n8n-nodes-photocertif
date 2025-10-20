@@ -67,30 +67,7 @@ Custom n8n node for **PhotoCertif** - **Image/Photo and Art certification** on S
 
 ## 📦 Installation
 
-### ⚠️ Required Dependencies
-
-**IMPORTANT:** This node requires `n8n-nodes-solana-swap` v1.6.1+ for Solana blockchain operations (CHECKHC token transfers, balance checks, swaps).
-
-**What's new in v1.6.1:**
-- ✅ SPL token transfers fully implemented with `@solana/spl-token`
-- ✅ Automatic associated token account creation
-- ✅ Compatible with all RPC providers (Helius, QuickNode, Alchemy)
-
-### Via npm (Recommended)
-
-```bash
-# Install both packages
-npm install n8n-nodes-solana-swap n8n-nodes-photocertif
-
-# Or globally for n8n
-cd ~/.n8n
-npm install n8n-nodes-solana-swap n8n-nodes-photocertif
-
-# Restart n8n
-n8n start
-```
-
-### Via n8n Community Nodes (When Published)
+### Via n8n Community Nodes (Recommended)
 
 1. Go to **Settings** → **Community Nodes**
 2. Click **Install**
@@ -128,7 +105,7 @@ Restart n8n after installation.
 
 ### Credential 2: Solana API ⭐ (Required for Automated Payments)
 
-**Provided by**: `n8n-nodes-solana-swap` package
+**Included in**: This package includes the Solana API credential
 
 **Required for**: Automated CHECKHC token transfers and blockchain operations
 
@@ -738,10 +715,10 @@ Trigger: Webhook or Schedule
 
 ### **Key Benefits of This Architecture:**
 
-✅ **Composable**: Mix PhotoCertif + SolanaSwap + any n8n node
+✅ **Composable**: Mix PhotoCertif with any n8n node
 ✅ **Flexible**: User can customize payment logic, add conditions, notifications
 ✅ **Reusable**: Solana API credential used across multiple operations
-✅ **Maintainable**: Updates to Solana logic happen in solana-swap package
+✅ **Self-Contained**: All necessary credentials included in the package
 ✅ **Scalable**: Easy to add batch processing, error handling, retries
 
 ---
