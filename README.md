@@ -13,7 +13,7 @@
 
 **Powered by [CHECKHC](https://www.checkhc.net) - The Web3 Certification Ecosystem**
 
-[🌐 Visit CHECKHC.net](https://www.checkhc.net) | [📦 PhotoCertif Platform](https://app.photocertif.com) | [💬 Discord Community](https://discord.com/channels/1324516144979382335/1429512698504151200)
+[🌐 CHECKHC.net](https://www.checkhc.net) | [📦 App Platform](https://app2.photocertif.com) | [💬 Discord Support](https://discord.com/channels/1324516144979382335/1429512698504151200)
 
 </div>
 
@@ -92,7 +92,7 @@ Restart n8n after installation.
 1. Open n8n → **Credentials** → **New Credential**
 2. Search for "**PhotoCertif API**"
 3. Fill in:
-   - **PhotoCertif URL**: `https://localhost` (dev) or `https://app2.photocertif.com` (prod)
+   - **PhotoCertif URL**: `https://app2.photocertif.com`
    - **API Key**: `pk_live_xxxxxxxxxxxxx`
 
 **Generate API Key:**
@@ -519,7 +519,7 @@ Loop: For each pending
 - Send reminder notification
 
 ### "Cannot connect to PhotoCertif"
-- Check URL is accessible: `https://app2.photocertif.com`
+- Verify PhotoCertif URL in credentials: `https://app2.photocertif.com`
 - Verify n8n can reach external networks
 - Check firewall rules
 
@@ -571,8 +571,8 @@ For GDPR inquiries: **privacy@checkhc.net**
 
 ## 📖 Additional Resources
 
-- **PhotoCertif Docs**: https://photocertif.com/docs
-- **API Reference**: https://photocertif.com/docs/api
+- **🌐 Official Website**: https://www.checkhc.net
+- **📦 App Platform**: https://app2.photocertif.com
 - **n8n Docs**: https://docs.n8n.io
 - **GitHub**: https://github.com/checkhc/n8n-nodes-photocertif
 
@@ -602,8 +602,8 @@ MIT License - See LICENSE file for details
 
 ### **Our Solutions:**
 
-- 🎨 **[PhotoCertif](https://app.photocertif.com)** - Image & Art Certification with AI Authentication
-- 📄 **[DigiCryptoStore](https://app.photocertif.com)** - Document Certification with Secure Blockchain Storage
+- 🎨 **[PhotoCertif](https://app2.photocertif.com)** - Image & Art Certification with AI Authentication
+- 📄 **[DigiCryptoStore](https://app2.photocertif.com)** - Document Certification with Secure Blockchain Storage
 - 🪙 **CHECKHC Token** - Native utility token on Solana blockchain
 - 🔗 **Blockchain Integration** - Solana + Secure Decentralized Storage
 - 🤖 **AI-Powered** - Advanced detection for authenticity verification
@@ -621,7 +621,7 @@ MIT License - See LICENSE file for details
 ### **🚀 Get Started:**
 
 1. **Explore:** Visit [www.checkhc.net](https://www.checkhc.net)
-2. **Try it:** Sign up at [app.photocertif.com](https://app.photocertif.com)
+2. **Try it:** Sign up at [app2.photocertif.com](https://app2.photocertif.com)
 3. **Get CHECKHC Tokens:** [Buy on Jupiter](https://jup.ag/swap/SOL-CHECKHC)
 4. **Automate:** Install this n8n node for B2B workflows
 5. **Join Community:** [Discord Channel](https://discord.com/channels/1324516144979382335/1429512698504151200)
@@ -631,7 +631,7 @@ MIT License - See LICENSE file for details
 Looking for custom integration or high-volume licensing?
 
 📧 Contact: **contact@checkhc.net**  
-🌐 Website: **[www.checkhc.net](https://www.checkhc.net)**
+🌐 **Official Website: [www.checkhc.net](https://www.checkhc.net)** ⭐
 
 ---
 
